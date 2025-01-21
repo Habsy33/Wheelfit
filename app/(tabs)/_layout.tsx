@@ -25,8 +25,14 @@ export default function TabLayout() {
           default: {},
         }),
       }}>
-      {/* Default to the "workouts" tab */}
-      <Tabs.Screen
+        <Tabs.Screen
+        name="index"
+        options={{
+          title: 'Workouts',
+          tabBarIcon: ({ color }) => <IconSymbol size={28} name="house.fill" color={color} />,
+        }}
+      />
+        <Tabs.Screen
         name="workouts"
         options={{
           title: 'Workouts',

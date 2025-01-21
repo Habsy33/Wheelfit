@@ -37,7 +37,7 @@ const workoutsData = [
   },
 ];
 
-export default function WorkoutsScreen() {
+export default function Workouts() {
   const colorScheme = useColorScheme();
 
   const renderWorkout = ({ item }: any) => (

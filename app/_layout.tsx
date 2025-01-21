@@ -6,8 +6,12 @@ import { StatusBar } from 'expo-status-bar';
 import { useEffect } from 'react';
 import 'react-native-reanimated';
 
+// THIS IS THE STYLING FOR THE BOTTOM SCREEN
+
+
 import { useColorScheme } from '@/hooks/useColorScheme';
 
+// Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
 
 export default function RootLayout() {
@@ -29,8 +33,7 @@ export default function RootLayout() {
   return (
     <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
       <Stack>
-        {/* Ensure "(tabs)" defaults to "workouts" */}
-        <Stack.Screen name="(tabs)" options={{ headerShown: false }} initialParams={{ screen: 'workouts' }} />
+        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
         <Stack.Screen name="+not-found" />
       </Stack>
       <StatusBar style="auto" />

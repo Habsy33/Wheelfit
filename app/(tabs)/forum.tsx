@@ -5,15 +5,59 @@ import {
   StyleSheet,
   TextInput,
   TouchableOpacity,
-  ScrollView,
   FlatList,
+  ListRenderItem,
 } from 'react-native';
 import { MaterialIcons, FontAwesome } from '@expo/vector-icons';
 
-const Forum = () => {
-  const posts = [
+// Define types for the items in the FlatList
+interface Post {
+  id: string;
+  type: 'post';
+  title: string;
+  tags: string[];
+  views: string;
+  likes: string;
+  comments: string;
+  author: string;
+}
+
+interface Meetup {
+  id: string;
+  type: 'meetup';
+  date: string;
+  title: string;
+  location: string;
+  format: string;
+}
+
+interface SearchItem {
+  id: string;
+  type: 'search';
+}
+
+interface FilterItem {
+  id: string;
+  type: 'filters';
+}
+
+interface CreatePostItem {
+  id: string;
+  type: 'createPost';
+}
+
+interface HeaderItem {
+  id: string;
+  type: 'header';
+}
+
+type ForumItem = Post | Meetup | SearchItem | FilterItem | CreatePostItem | HeaderItem;
+
+const Forum: React.FC = () => {
+  const posts: Post[] = [
     {
       id: '1',
+      type: 'post',
       title: "Conquering Home Workouts: What's in Your Routine?",
       tags: ['wheelchair', 'fitness', 'daily exercise'],
       views: '651,324 Views',
@@ -23,6 +67,7 @@ const Forum = () => {
     },
     {
       id: '2',
+      type: 'post',
       title: 'Tackling Upper-Body Strength: My Progress with Resistance Bands!',
       tags: ['resistance bands', 'upper body', 'progress update'],
       views: '244,568 Views',
@@ -32,16 +77,18 @@ const Forum = () => {
     },
   ];
 
-  const meetups = [
+  const meetups: Meetup[] = [
     {
-      id: '1',
+      id: '3',
+      type: 'meetup',
       date: 'APR 25',
       title: 'Technogym MOVES 2025 Challenge',
       location: 'Technogym, Glasgow Club, Scotland',
       format: 'Remote / Workshop',
     },
     {
-      id: '2',
+      id: '4',
+      type: 'meetup',
       date: 'JUL 13',
       title: 'SDS Summer Camp 2025',
       location: 'Scottish Disability Sport, Scotland, United Kingdom',
@@ -49,104 +96,109 @@ const Forum = () => {
     },
   ];
 
-  const renderPost = ({ item }: { item: typeof posts[0] }) => (
-    <View style={styles.postContainer}>
-      <Text style={styles.postTitle}>{item.title}</Text>
-      <View style={styles.tagsContainer}>
-        {item.tags.map((tag, index) => (
-          <View key={index} style={styles.tag}>
-            <Text style={styles.tagText}>{tag}</Text>
-          </View>
-        ))}
-      </View>
-      <Text style={styles.postMeta}>
-        {item.views} • {item.likes} • {item.comments}
-      </Text>
-    </View>
-  );
+  const combinedData: ForumItem[] = [
+    { id: 'search', type: 'search' },
+    { id: 'filters', type: 'filters' },
+    { id: 'createPost', type: 'createPost' },
+    ...posts,
+    { id: 'meetupsHeader', type: 'header' },
+    ...meetups,
+  ];
 
-  const renderMeetup = ({ item }: { item: typeof meetups[0] }) => (
-    <View style={styles.meetupContainer}>
-      <View style={styles.meetupDate}>
-        <Text style={styles.meetupMonth}>{item.date.split(' ')[0]}</Text>
-        <Text style={styles.meetupDay}>{item.date.split(' ')[1]}</Text>
-      </View>
-      <View style={styles.meetupInfo}>
-        <Text style={styles.meetupTitle}>{item.title}</Text>
-        <Text style={styles.meetupLocation}>{item.location}</Text>
-        <Text style={styles.meetupFormat}>{item.format}</Text>
-      </View>
-    </View>
-  );
+  const renderItem: ListRenderItem<ForumItem> = ({ item }) => {
+    switch (item.type) {
+      case 'search':
+        return (
+          <View style={styles.searchBar}>
+            <MaterialIcons name="search" size={24} color="#666" />
+            <TextInput
+              style={styles.searchInput}
+              placeholder="Search forum..."
+              placeholderTextColor="#999"
+            />
+          </View>
+        );
+      case 'filters':
+        return (
+          <View style={styles.filters}>
+            <TouchableOpacity style={styles.filterButton}>
+              <MaterialIcons name="fiber-new" size={20} color="#005CEE" />
+              <Text style={styles.filterText}>Newest</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.filterButton}>
+              <FontAwesome name="fire" size={20} color="#FF4500" />
+              <Text style={styles.filterText}>Popular</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.filterButton}>
+              <MaterialIcons name="people" size={20} color="#F9A825" />
+              <Text style={styles.filterText}>Following</Text>
+            </TouchableOpacity>
+          </View>
+        );
+      case 'createPost':
+        return (
+          <View style={styles.createPost}>
+            <TextInput
+              style={styles.createPostInput}
+              placeholder="Let's share what's going on..."
+              placeholderTextColor="#999"
+            />
+            <TouchableOpacity style={styles.createPostButton}>
+              <Text style={styles.createPostButtonText}>Create Post</Text>
+            </TouchableOpacity>
+          </View>
+        );
+      case 'post':
+        return (
+          <View style={styles.postContainer}>
+            <Text style={styles.postTitle}>{item.title}</Text>
+            <View style={styles.tagsContainer}>
+              {item.tags.map((tag, index) => (
+                <View key={index} style={styles.tag}>
+                  <Text style={styles.tagText}>{tag}</Text>
+                </View>
+              ))}
+            </View>
+            <Text style={styles.postMeta}>
+              {item.views} • {item.likes} • {item.comments}
+            </Text>
+          </View>
+        );
+      case 'header':
+        return <Text style={styles.meetupsHeader}>Meetups →</Text>;
+      case 'meetup':
+        return (
+          <View style={styles.meetupContainer}>
+            <View style={styles.meetupDate}>
+              <Text style={styles.meetupMonth}>{item.date.split(' ')[0]}</Text>
+              <Text style={styles.meetupDay}>{item.date.split(' ')[1]}</Text>
+            </View>
+            <View style={styles.meetupInfo}>
+              <Text style={styles.meetupTitle}>{item.title}</Text>
+              <Text style={styles.meetupLocation}>{item.location}</Text>
+              <Text style={styles.meetupFormat}>{item.format}</Text>
+            </View>
+          </View>
+        );
+      default:
+        return null;
+    }
+  };
 
   return (
-    <ScrollView style={styles.container}>
-      {/* Search Bar */}
-      <View style={styles.searchBar}>
-        <MaterialIcons name="search" size={24} color="#666" />
-        <TextInput
-          style={styles.searchInput}
-          placeholder="Search forum..."
-          placeholderTextColor="#999"
-        />
-      </View>
-
-      {/* Filter Buttons */}
-      <View style={styles.filters}>
-        <TouchableOpacity style={styles.filterButton}>
-          <MaterialIcons name="fiber-new" size={20} color="#005CEE" />
-          <Text style={styles.filterText}>Newest</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.filterButton}>
-          <FontAwesome name="fire" size={20} color="#FF4500" />
-          <Text style={styles.filterText}>Popular</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.filterButton}>
-          <MaterialIcons name="people" size={20} color="#F9A825" />
-          <Text style={styles.filterText}>Following</Text>
-        </TouchableOpacity>
-      </View>
-
-      {/* Create Post */}
-      <View style={styles.createPost}>
-        <TextInput
-          style={styles.createPostInput}
-          placeholder="Let's share what's going on..."
-          placeholderTextColor="#999"
-        />
-        <TouchableOpacity style={styles.createPostButton}>
-          <Text style={styles.createPostButtonText}>Create Post</Text>
-        </TouchableOpacity>
-      </View>
-
-      {/* Posts */}
-      <FlatList
-        data={posts}
-        renderItem={renderPost}
-        keyExtractor={(item) => item.id}
-        style={styles.postsList}
-      />
-
-      <TouchableOpacity style={styles.seeMoreButton}>
-        <Text style={styles.seeMoreText}>See more →</Text>
-      </TouchableOpacity>
-
-      {/* Meetups Section */}
-      <Text style={styles.meetupsHeader}>Meetups →</Text>
-      <FlatList
-        data={meetups}
-        renderItem={renderMeetup}
-        keyExtractor={(item) => item.id}
-        style={styles.meetupsList}
-      />
-    </ScrollView>
+    <FlatList
+      data={combinedData}
+      renderItem={renderItem}
+      keyExtractor={(item) => item.id}
+      contentContainerStyle={styles.container}
+    />
   );
 };
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
     backgroundColor: '#f9f9f9',
+    paddingBottom: 16,
   },
   searchBar: {
     flexDirection: 'row',
@@ -207,9 +259,6 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontWeight: 'bold',
   },
-  postsList: {
-    marginHorizontal: 16,
-  },
   postContainer: {
     backgroundColor: '#fff',
     padding: 16,
@@ -243,23 +292,11 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: '#666',
   },
-  seeMoreButton: {
-    alignSelf: 'flex-end',
-    marginHorizontal: 16,
-    marginVertical: 8,
-  },
-  seeMoreText: {
-    color: '#005CEE',
-    fontWeight: 'bold',
-  },
   meetupsHeader: {
     fontSize: 18,
     fontWeight: 'bold',
     marginHorizontal: 16,
     marginVertical: 8,
-  },
-  meetupsList: {
-    marginHorizontal: 16,
   },
   meetupContainer: {
     flexDirection: 'row',
