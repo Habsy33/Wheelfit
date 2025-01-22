@@ -1,40 +1,16 @@
 import React from 'react';
-import { View, Text, TextInput, StyleSheet, Image, FlatList, TouchableOpacity } from 'react-native';
+import { View, Text, TextInput, StyleSheet, Image, FlatList, ScrollView, TouchableOpacity } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { ThemedView } from '@/components/ThemedView';
-import { ThemedText } from '@/components/ThemedText';
 import { useColorScheme } from '@/hooks/useColorScheme';
+import { Header } from '@/components/Header';
 
 const workoutsData = [
-  {
-    title: 'Abs - Intermediate',
-    duration: '25 mins',
-    level: 'Intermediate',
-    image: require('@/assets/images/abs.png'), 
-  },
-  {
-    title: 'Chest - Easy',
-    duration: '15 mins',
-    level: 'Beginner',
-    image: require('@/assets/images/chest.png'), 
-  },
-  {
-    title: 'Shoulder & Back - Intermediate',
-    duration: '15 mins',
-    level: 'Intermediate',
-    image: require('@/assets/images/shoulder_back.png'), 
-  },
-  {
-    title: 'Arms - Intermediate',
-    duration: '15 mins',
-    level: 'Intermediate',
-    image: require('@/assets/images/arms.png'), 
-  },
-  {
-    title: 'Follow Along - Advanced',
-    duration: '15 mins',
-    level: 'Advanced',
-    image: require('@/assets/images/arms.png'), 
-  },
+  { title: 'Abs - Intermediate', duration: '25 mins', level: 'Intermediate', image: require('@/assets/images/abs.png') },
+  { title: 'Chest - Easy', duration: '15 mins', level: 'Beginner', image: require('@/assets/images/chest.png') },
+  { title: 'Shoulder & Back - Intermediate', duration: '15 mins', level: 'Intermediate', image: require('@/assets/images/shoulder_back.png') },
+  { title: 'Arms - Intermediate', duration: '15 mins', level: 'Intermediate', image: require('@/assets/images/arms.png') },
+  { title: 'Follow Along - Advanced', duration: '15 mins', level: 'Advanced', image: require('@/assets/images/arms.png') },
 ];
 
 export default function Workouts() {
@@ -53,85 +29,110 @@ export default function Workouts() {
   );
 
   return (
-    <ThemedView style={styles.container}>
-      <View style={styles.header}>
-        <Text style={styles.logoText}>WheelFit</Text>
-        <TextInput
-          style={styles.searchInput}
-          placeholder="Search workouts, plans..."
-          placeholderTextColor="#A9A9A9"
-        />
-      </View>
-      <ThemedText type="title" style={styles.sectionTitle}>
-        Featured Workouts
-      </ThemedText>
-      <View style={styles.featuredContainer}>
-        <TouchableOpacity style={styles.featuredCard}>
-          <Image
-            source={require('@/assets/images/featured_workout.png')} 
-            style={styles.featuredImage}
+    <SafeAreaView style={styles.safeAreaContainer}>
+      <ThemedView style={styles.container}>
+        <ScrollView contentContainerStyle={styles.scrollContainer}>
+          {/* Header Component */}
+          <Header 
+            title="WheelFit" 
+            streak="28/30" 
+            subtitle="Adaptive Home Workouts" 
           />
-          <Text style={styles.featuredText}>MASSIVE UPPER BODY</Text>
-          <Text style={styles.featuredDesc}>
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-          </Text>
-          <TouchableOpacity style={styles.startButton}>
-            <Text style={styles.startButtonText}>Start</Text>
-          </TouchableOpacity>
-        </TouchableOpacity>
-      </View>
-      <View style={styles.quickStartContainer}>
-        <Text style={styles.sectionTitle}>Quick Start</Text>
-        <View style={styles.filterContainer}>
-          <Text style={styles.filterText}>Beginner</Text>
-          <Text style={styles.filterText}>Intermediate</Text>
-          <Text style={styles.filterText}>Advanced</Text>
-        </View>
-        <FlatList
-          data={workoutsData}
-          keyExtractor={(item, index) => index.toString()}
-          renderItem={renderWorkout}
-          style={styles.workoutsList}
-        />
-      </View>
-    </ThemedView>
+
+          {/* Search Bar */}
+          <TextInput
+            style={styles.searchInput}
+            placeholder="Search workouts, plans..."
+            placeholderTextColor="#A9A9A9"
+          />
+
+          {/* Welcome User */}
+          <Text style={styles.welcomeText}>Welcome, User</Text>
+
+          {/* Featured Workouts */}
+          <Text style={styles.sectionTitle}>Featured Workouts</Text>
+          <View style={styles.featuredContainer}>
+            <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+              {/* First Featured Card */}
+              <TouchableOpacity style={styles.featuredCard}>
+                <Image source={require('@/assets/images/featured_workout.png')} style={styles.featuredImage} />
+                <Text style={styles.featuredText}>MASSIVE UPPER BODY</Text>
+                <Text style={styles.featuredDesc}>Lorem ipsum dolor sit amet, consectetur adipiscing elit.</Text>
+                <TouchableOpacity style={styles.startButton}>
+                  <Text style={styles.startButtonText}>Start</Text>
+                </TouchableOpacity>
+              </TouchableOpacity>
+
+              {/* Second Featured Card */}
+              <TouchableOpacity style={[styles.featuredCard, { marginLeft: 16 }]}>
+                <Image source={require('@/assets/images/featured_workout.png')} style={styles.featuredImage} />
+                <Text style={styles.featuredText}>LEGS & CORE BLAST</Text>
+                <Text style={styles.featuredDesc}>Push your limits with this intense workout for legs and core.</Text>
+                <TouchableOpacity style={styles.startButton}>
+                  <Text style={styles.startButtonText}>Start</Text>
+                </TouchableOpacity>
+              </TouchableOpacity>
+            </ScrollView>
+          </View>
+
+          {/* Quick Start Section */}
+          <View style={styles.quickStartContainer}>
+            <Text style={[styles.sectionTitle, styles.quickStartTitle]}>Quick Start</Text>
+            <Text style={styles.classicText}>Classic Workouts</Text>
+
+            <View style={styles.filterContainer}>
+              <Text style={styles.filterBadge}>Beginner</Text>
+              <Text style={styles.filterBadge}>Intermediate</Text>
+              <Text style={styles.filterBadge}>Advanced</Text>
+            </View>
+            <FlatList
+              data={workoutsData}
+              keyExtractor={(item, index) => index.toString()}
+              renderItem={renderWorkout}
+              style={styles.workoutsList}
+            />
+          </View>
+        </ScrollView>
+      </ThemedView>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
+  safeAreaContainer: {
+    flex: 1,
+    backgroundColor: '#F1F0F0', // Matches the app background
+    marginTop: -50,
+  },
   container: {
     flex: 1,
-    padding: 16,
+    backgroundColor: '#F1F0F0',
   },
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 16,
-  },
-  logoText: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: '#333',
+  scrollContainer: {
+    padding: 1,
   },
   searchInput: {
-    flex: 1,
-    marginLeft: 16,
-    backgroundColor: '#F5F5F5',
-    padding: 8,
+    backgroundColor: '#FFF',
+    padding: 10,
     borderRadius: 8,
+    marginBottom: 16,
   },
   sectionTitle: {
     fontSize: 18,
     fontWeight: 'bold',
-    marginVertical: 8,
+    marginBottom: 1,
+    padding: 10,
   },
   featuredContainer: {
-    marginBottom: 16,
+    marginTop: 0,
+    marginBottom: 10,
+    padding: 5,
   },
   featuredCard: {
-    backgroundColor: '#E8F5FF',
-    borderRadius: 8,
-    padding: 16,
+    backgroundColor: '#4476d8',
+    borderRadius: 15,
+    padding: 10,
+    width: 250,
   },
   featuredImage: {
     width: '100%',
@@ -145,32 +146,46 @@ const styles = StyleSheet.create({
   },
   featuredDesc: {
     marginTop: 4,
-    color: '#555',
+    color: '#FFF',
   },
   startButton: {
     marginTop: 8,
-    backgroundColor: '#007BFF',
+    backgroundColor: '#FFFFFF',
     padding: 8,
     borderRadius: 8,
   },
   startButtonText: {
-    color: '#FFF',
+    color: '#406DC6',
+    fontWeight: 'bold',
+    fontSize: 20,
     textAlign: 'center',
   },
   quickStartContainer: {
-    marginTop: 16,
+    marginTop: 6,
+  },
+  quickStartTitle: {
+    color: '#333',
   },
   filterContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     marginVertical: 8,
+    marginTop: 0,
+    padding: 10,
   },
-  filterText: {
+  filterBadge: {
+    backgroundColor: '#007BFF',
+    color: '#FFF',
+    paddingVertical: 7,
+    paddingHorizontal: 15,
+    borderRadius: 16,
+    fontSize: 14,
+    textAlign: 'center',
     fontWeight: 'bold',
-    color: '#007BFF',
   },
   workoutsList: {
-    marginTop: 8,
+    marginTop: -5,
+    padding: 10,
   },
   workoutCard: {
     flexDirection: 'row',
@@ -202,5 +217,23 @@ const styles = StyleSheet.create({
     color: '#555',
     fontSize: 12,
     marginTop: 4,
+  },
+  classicText: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: '#333',
+    marginTop: -10,
+    marginBottom: -5,
+    textAlign: 'left',
+    padding: 10,
+  },
+  welcomeText: {
+    fontSize: 30,
+    fontWeight: 'bold',
+    color: '#333',
+    marginTop: 0,
+    marginBottom: -5,
+    textAlign: 'left',
+    padding: 10,
   },
 });
