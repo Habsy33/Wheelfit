@@ -9,6 +9,7 @@ import {
   Image,
 } from 'react-native';
 import { MaterialIcons, FontAwesome } from '@expo/vector-icons';
+import { Header } from '@/components/Header'; // Importing the Header component
 
 const Profile = () => {
   const [faceIdEnabled, setFaceIdEnabled] = React.useState(false);
@@ -18,6 +19,18 @@ const Profile = () => {
   return (
     <ScrollView style={styles.container}>
       {/* Header Section */}
+      <Header
+        title="WheelFit" // Your app title
+        subtitle="Adaptive Home Workouts" // Subtitle for the header
+        streak="28/30" // Example streak value
+      />
+
+            {/* "Me" Text Section */}
+            <View style={styles.meSection}>
+        <Text style={styles.meText}>Me</Text>
+      </View>
+
+      {/* Profile Section */}
       <View style={styles.header}>
         <Image
           source={{ uri: 'https://via.placeholder.com/150' }} // Replace with your profile image source
@@ -107,8 +120,11 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#f9f9f9',
+    marginTop: -50,
   },
   header: {
+    marginTop: 20,
+    marginBottom: 20,
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: '#005CEE',
@@ -119,11 +135,12 @@ const styles = StyleSheet.create({
   profileImage: {
     width: 60,
     height: 60,
-    borderRadius: 30,
+    borderRadius: 50,
     marginRight: 12,
   },
   profileInfo: {
     flex: 1,
+    
   },
   name: {
     color: '#fff',
@@ -170,6 +187,14 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     marginHorizontal: 16,
     paddingVertical: 8,
+  },
+  meSection: {
+    padding: 16,
+  },
+  meText: {
+    fontSize: 40,
+    fontWeight: 'bold',
+    color: '#333',
   },
 });
 

@@ -9,6 +9,7 @@ import {
   ListRenderItem,
 } from 'react-native';
 import { MaterialIcons, FontAwesome } from '@expo/vector-icons';
+import { Header } from '@/components/Header'; // Importing the Header component
 
 // Define types for the items in the FlatList
 interface Post {
@@ -186,12 +187,22 @@ const Forum: React.FC = () => {
   };
 
   return (
-    <FlatList
-      data={combinedData}
-      renderItem={renderItem}
-      keyExtractor={(item) => item.id}
-      contentContainerStyle={styles.container}
-    />
+    <View style={{ flex: 1 }}>
+      {/* Wrap Header component in a container to adjust position */}
+      <View style={styles.headerWrapper}>
+        <Header
+          streak="28/30"
+          title="WheelFit"
+          subtitle="Adaptive Home Workouts"
+        />
+      </View>
+      <FlatList
+        data={combinedData}
+        renderItem={renderItem}
+        keyExtractor={(item) => item.id}
+        contentContainerStyle={styles.container}
+      />
+    </View>
   );
 };
 
@@ -199,6 +210,12 @@ const styles = StyleSheet.create({
   container: {
     backgroundColor: '#f9f9f9',
     paddingBottom: 16,
+    marginTop: 1,
+  },
+  headerWrapper: {
+    position: 'relative', // Allows adjustment of header position if needed
+    marginBottom: -5, // You can adjust this for spacing
+    marginTop: -50,
   },
   searchBar: {
     flexDirection: 'row',

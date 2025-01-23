@@ -28,7 +28,7 @@ export const Header: React.FC<HeaderProps> = ({ streak, title, subtitle }) => {
 const styles = StyleSheet.create({
   headerWrapper: {
     backgroundColor: '#406DC6', // Customizable background color
-    borderRadius: 16, // Adds rounded corners
+    borderRadius: 20, // Adds rounded corners
     overflow: 'hidden', // Ensures content respects the borderRadius
     marginHorizontal: -2, // Adds some spacing on the sides
   },

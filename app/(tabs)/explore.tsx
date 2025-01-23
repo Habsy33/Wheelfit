@@ -7,6 +7,7 @@ import {
   Dimensions,
 } from 'react-native';
 import { FontAwesome5, MaterialCommunityIcons } from '@expo/vector-icons';
+import { Header } from '@/components/Header'; // Importing the Header component
 
 const Explore = () => {
   const fitnessInsights = {
@@ -26,78 +27,92 @@ const Explore = () => {
     "“Don't limit your challenges, challenge your limits.”";
 
   return (
-    <ScrollView style={styles.container}>
-      {/* Motivational Card */}
-      <View style={[styles.card, styles.motivationalCard]}>
-        <FontAwesome5 name="quote-left" size={24} color="#fff" />
-        <Text style={styles.motivationalText}>{motivationalQuote}</Text>
-        <FontAwesome5 name="quote-right" size={24} color="#fff" />
-      </View>
+    <View style={styles.wrapper}>
+      {/* Header Component */}
+      <Header 
+        streak={`${dailyStreak}/30`} 
+        title="WheelFit" 
+        subtitle="Adaptive Home Workouts" 
+      />
 
-      {/* Fitness Insights Card */}
-      <View style={styles.card}>
-        <Text style={styles.cardTitle}>Fitness Insights</Text>
-        <View style={styles.insightRow}>
-          <View style={styles.insightItem}>
-            <MaterialCommunityIcons
-              name="fire"
-              size={36}
-              color="#FF4500"
-            />
-            <Text style={styles.insightValue}>
-              {fitnessInsights.caloriesBurned}
-            </Text>
-            <Text style={styles.insightLabel}>Calories Burned</Text>
-          </View>
-          <View style={styles.insightItem}>
-            <MaterialCommunityIcons
-              name="timer"
-              size={36}
-              color="#005CEE"
-            />
-            <Text style={styles.insightValue}>
-              {fitnessInsights.minutesExercised}
-            </Text>
-            <Text style={styles.insightLabel}>Minutes Exercised</Text>
-          </View>
-          <View style={styles.insightItem}>
-            <MaterialCommunityIcons
-              name="dumbbell"
-              size={36}
-              color="#FFD700"
-            />
-            <Text style={styles.insightValue}>
-              {fitnessInsights.totalWorkouts}
-            </Text>
-            <Text style={styles.insightLabel}>Total Workouts</Text>
+      <ScrollView style={styles.container}>
+        {/* Motivational Card */}
+        <View style={[styles.card, styles.motivationalCard]}>
+          <FontAwesome5 name="quote-left" size={24} color="#fff" />
+          <Text style={styles.motivationalText}>{motivationalQuote}</Text>
+          <FontAwesome5 name="quote-right" size={24} color="#fff" />
+        </View>
+
+        {/* Fitness Insights Card */}
+        <View style={styles.card}>
+          <Text style={styles.cardTitle}>Fitness Insights</Text>
+          <View style={styles.insightRow}>
+            <View style={styles.insightItem}>
+              <MaterialCommunityIcons
+                name="fire"
+                size={36}
+                color="#FF4500"
+              />
+              <Text style={styles.insightValue}>
+                {fitnessInsights.caloriesBurned}
+              </Text>
+              <Text style={styles.insightLabel}>Calories Burned</Text>
+            </View>
+            <View style={styles.insightItem}>
+              <MaterialCommunityIcons
+                name="timer"
+                size={36}
+                color="#005CEE"
+              />
+              <Text style={styles.insightValue}>
+                {fitnessInsights.minutesExercised}
+              </Text>
+              <Text style={styles.insightLabel}>Minutes Exercised</Text>
+            </View>
+            <View style={styles.insightItem}>
+              <MaterialCommunityIcons
+                name="dumbbell"
+                size={36}
+                color="#FFD700"
+              />
+              <Text style={styles.insightValue}>
+                {fitnessInsights.totalWorkouts}
+              </Text>
+              <Text style={styles.insightLabel}>Total Workouts</Text>
+            </View>
           </View>
         </View>
-      </View>
 
-      {/* Training Comparison Card */}
-      <View style={styles.card}>
-        <Text style={styles.cardTitle}>Training Comparison</Text>
-        <Text style={styles.trainingText}>
-          You trained <Text style={styles.highlight}>{trainingComparison.currentWeek - trainingComparison.lastWeek}</Text> more
-          sessions this week than last week!
-        </Text>
-      </View>
-
-      {/* Daily Streak Card */}
-      <View style={styles.card}>
-        <Text style={styles.cardTitle}>Daily Streak</Text>
-        <View style={styles.streakRow}>
-          <MaterialCommunityIcons name="run" size={48} color="#32CD32" />
-          <Text style={styles.streakText}>
-            You're on a <Text style={styles.highlight}>{dailyStreak}-day</Text> streak of exercising daily!
+        {/* Training Comparison Card */}
+        <View style={styles.card}>
+          <Text style={styles.cardTitle}>Training Comparison</Text>
+          <Text style={styles.trainingText}>
+            You trained <Text style={styles.highlight}>{trainingComparison.currentWeek - trainingComparison.lastWeek}</Text> more
+            sessions this week than last week!
           </Text>
         </View>
-      </View>
-    </ScrollView>
+
+        {/* Daily Streak Card */}
+        <View style={styles.card}>
+          <Text style={styles.cardTitle}>Daily Streak</Text>
+          <View style={styles.streakRow}>
+            <MaterialCommunityIcons name="run" size={48} color="#32CD32" />
+            <Text style={styles.streakText}>
+              You're on a <Text style={styles.highlight}>{dailyStreak}-day</Text> streak of exercising daily!
+            </Text>
+          </View>
+        </View>
+      </ScrollView>
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
+  wrapper: {
+    flex: 1,
+    backgroundColor: '#f9f9f9',
+    marginTop: -49,
+  },
   container: {
     flex: 1,
     backgroundColor: '#f9f9f9',
