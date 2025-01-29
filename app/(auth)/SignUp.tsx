@@ -7,8 +7,12 @@ import {
   StyleSheet,
 } from 'react-native';
 import { Ionicons, FontAwesome } from '@expo/vector-icons';
+import { useNavigation } from '@react-navigation/native';
+import { AuthNavigationProp } from './AppNavigation';
 
 const SignUp: React.FC = () => {
+  const navigation = useNavigation<AuthNavigationProp>(); 
+
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
@@ -25,7 +29,10 @@ const SignUp: React.FC = () => {
   return (
     <View style={styles.container}>
       {/* Back Button */}
-      <TouchableOpacity style={styles.backButton}>
+      <TouchableOpacity
+        style={styles.backButton}
+        onPress={() => navigation.goBack()} // Navigate back to the previous screen
+      >
         <Ionicons name="chevron-back" size={24} color="#000" />
       </TouchableOpacity>
 
@@ -105,7 +112,12 @@ const SignUp: React.FC = () => {
       <View style={styles.footer}>
         <Text style={styles.footerText}>
           Already have an account?{' '}
-          <Text style={styles.link}>Sign In</Text>
+          <Text
+            style={styles.link}
+            onPress={() => navigation.navigate('SignIn')} // Navigate to the SignIn screen
+          >
+            Sign In
+          </Text>
         </Text>
       </View>
     </View>

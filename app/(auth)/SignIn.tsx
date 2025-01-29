@@ -8,9 +8,11 @@ import {
 } from 'react-native';
 import { Ionicons, FontAwesome } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
+import { AuthNavigationProp } from './AppNavigation';
+
 
 const SignIn: React.FC = () => {
-  const navigation = useNavigation();
+  const navigation = useNavigation<AuthNavigationProp>(); 
 
   return (
     <View style={styles.container}>
@@ -76,15 +78,16 @@ const SignIn: React.FC = () => {
         <Text style={styles.footerText}>
           Don’t have an account?{' '}
           <Text
-            style={styles.link}
-            onPress={() => navigation.navigate('SignUp')}
-          >
-            Sign Up
-          </Text>
+          style={styles.link}
+          onPress={() => navigation.navigate('SignUp')}
+        >
+          Sign Up
         </Text>
-        <TouchableOpacity>
+        </Text>
+        <TouchableOpacity onPress={() => navigation.navigate('ForgotPassword')}>
           <Text style={styles.link}>Forgot Password</Text>
         </TouchableOpacity>
+
       </View>
     </View>
   );
