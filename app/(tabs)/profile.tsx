@@ -9,31 +9,47 @@ import {
   Image,
 } from 'react-native';
 import { MaterialIcons, FontAwesome } from '@expo/vector-icons';
-import { Header } from '@/components/Header'; // Importing the Header component
+import { Header } from '@/components/Header';
+import { signOut } from "firebase/auth"; // Import signOut method
+import { auth } from '@/firebaseConfig'; // Import Firebase authentication instance
+import { useNavigation } from '@react-navigation/native'; // Import navigation hook
+import { useRouter } from "expo-router"; 
+
 
 const Profile = () => {
   const [faceIdEnabled, setFaceIdEnabled] = React.useState(false);
+  const navigation = useNavigation(); // Get navigation object
 
   const toggleFaceId = () => setFaceIdEnabled((previousState) => !previousState);
 
+  const router = useRouter(); // Initialize router
+
+  // ✅ Logout function
+  const handleLogout = async () => {
+    try {
+      await signOut(auth);
+      console.log("User signed out");
+  
+      // Navigate to sign-in screen after logout
+      router.replace("(auth)/sign-in"); // Adjust path it's currently not working
+    } catch (error) {
+      console.error("Logout error:", error);
+    }
+  };
+
   return (
     <ScrollView style={styles.container}>
-      {/* Header Section */}
-      <Header
-        title="WheelFit" // Your app title
-        subtitle="Adaptive Home Workouts" // Subtitle for the header
-        streak="28/30" // Example streak value
-      />
+      <Header title="WheelFit" subtitle="Adaptive Home Workouts" streak="28/30" />
 
-            {/* "Me" Text Section */}
-            <View style={styles.meSection}>
+      {/* "Me" Text Section */}
+      <View style={styles.meSection}>
         <Text style={styles.meText}>Me</Text>
       </View>
 
       {/* Profile Section */}
       <View style={styles.header}>
         <Image
-          source={{ uri: 'https://via.placeholder.com/150' }} // Replace with your profile image source
+          source={{ uri: 'https://via.placeholder.com/150' }}
           style={styles.profileImage}
         />
         <View style={styles.profileInfo}>
@@ -93,7 +109,8 @@ const Profile = () => {
           <MaterialIcons name="chevron-right" size={24} color="#666" />
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.option}>
+        {/* ✅ Log Out Button */}
+        <TouchableOpacity style={styles.option} onPress={handleLogout}>
           <View style={styles.optionLeft}>
             <MaterialIcons name="logout" size={24} color="#666" />
             <Text style={styles.optionText}>Log out</Text>
@@ -115,6 +132,7 @@ const Profile = () => {
     </ScrollView>
   );
 };
+
 
 const styles = StyleSheet.create({
   container: {

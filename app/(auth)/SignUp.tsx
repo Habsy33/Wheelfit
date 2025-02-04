@@ -9,6 +9,9 @@ import {
 import { Ionicons, FontAwesome } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import { AuthNavigationProp } from './AppNavigation';
+import { createUserWithEmailAndPassword } from "firebase/auth";
+import { auth, db } from "@/firebaseConfig"; 
+import { doc, setDoc } from "firebase/firestore";
 
 const SignUp: React.FC = () => {
   const navigation = useNavigation<AuthNavigationProp>(); 
@@ -16,15 +19,46 @@ const SignUp: React.FC = () => {
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
+  const [fullName, setFullName] = useState('');
+const [email, setEmail] = useState('');
 
-  const handleSignUp = () => {
-    if (password !== confirmPassword) {
-      setErrorMessage("Passwords don't match!");
-    } else {
-      setErrorMessage('');
-      // Add sign-up logic here
+const handleSignUp = async () => {
+  try {
+    if (!email || !password || !confirmPassword || !fullName) {
+      setErrorMessage("Please fill in all fields.");
+      return;
     }
-  };
+
+    if (password !== confirmPassword) {
+      setErrorMessage("Passwords do not match.");
+      return;
+    }
+
+    const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+    console.log('Signed up:', userCredential.user);
+
+    // Store user details in Firestore
+    const userDocRef = doc(db, 'users', userCredential.user.uid);
+    await setDoc(userDocRef, {
+      fullName: fullName,
+      email: email,
+      createdAt: new Date(),
+    });
+
+    // Navigate to the main app (tabs)
+    navigation.reset({
+      index: 0,
+      routes: [{ name: "(tabs)" as never }],
+    });
+
+  } catch (error) {
+    console.error('Error signing up:', error);
+    setErrorMessage((error as Error).message || "An unexpected error occurred.");
+  }
+};
+
+
+  
 
   return (
     <View style={styles.container}>
@@ -50,6 +84,7 @@ const SignUp: React.FC = () => {
           autoCapitalize="words"
           placeholder="Full Name"
           placeholderTextColor="#999"
+          onChangeText={setFullName}
         />
       </View>
 
@@ -62,6 +97,7 @@ const SignUp: React.FC = () => {
           autoCapitalize="none"
           placeholder="Email Address"
           placeholderTextColor="#999"
+          onChangeText={setEmail}
         />
       </View>
 

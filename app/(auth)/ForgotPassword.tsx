@@ -1,10 +1,5 @@
 import React from 'react';
-import {
-  View,
-  Text,
-  TouchableOpacity,
-  StyleSheet,
-} from 'react-native';
+import {View, Text, TouchableOpacity, StyleSheet, } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 
@@ -58,7 +53,7 @@ const ForgotPassword: React.FC = () => {
 
 const styles = StyleSheet.create({
   container: { flex: 1, padding: 20, backgroundColor: '#fff' },
-  backButton: { marginBottom: 20 },
+  backButton: { marginBottom: 130, marginTop:20, },
   title: { fontSize: 24, fontWeight: 'bold', marginBottom: 10 },
   subtitle: { fontSize: 14, color: '#666', marginBottom: 20 },
   optionButton: { flexDirection: 'row', alignItems: 'center', backgroundColor: '#ddd', padding: 15, borderRadius: 10, marginBottom: 10 },

@@ -1,9 +1,45 @@
-import React from 'react';
-import { View, Text, TextInput, StyleSheet, Image, FlatList, ScrollView, TouchableOpacity } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import {
+  View,
+  Text,
+  TextInput,
+  StyleSheet,
+  Image,
+  FlatList,
+  TouchableOpacity,
+  ActivityIndicator
+} from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { ThemedView } from '@/components/ThemedView';
 import { useColorScheme } from '@/hooks/useColorScheme';
 import { Header } from '@/components/Header';
+import { Redirect } from 'expo-router';
+import { auth } from '@/firebaseConfig';
+import { onAuthStateChanged, User } from 'firebase/auth';
+
+export default function Index() {
+  const [user, setUser] = useState<User | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (authenticatedUser) => {
+      setUser(authenticatedUser);
+      setLoading(false);
+    });
+
+    return () => unsubscribe();
+  }, []);
+
+  if (loading) {
+    return <ActivityIndicator size="large" color="#0000ff" />;
+  }
+
+  if (!user) {
+    return <Redirect href="../(auth)/SignIn" />;
+  }
+
+  return <Workouts />;
+}
 
 const workoutsData = [
   { title: 'Abs - Intermediate', duration: '25 mins', level: 'Intermediate', image: require('@/assets/images/abs.png') },
@@ -13,7 +49,7 @@ const workoutsData = [
   { title: 'Follow Along - Advanced', duration: '15 mins', level: 'Advanced', image: require('@/assets/images/arms.png') },
 ];
 
-export default function Workouts() {
+function Workouts() {
   const colorScheme = useColorScheme();
 
   const renderWorkout = ({ item }: any) => (
@@ -31,72 +67,62 @@ export default function Workouts() {
   return (
     <SafeAreaView style={styles.safeAreaContainer}>
       <ThemedView style={styles.container}>
-        <ScrollView contentContainerStyle={styles.scrollContainer}>
-          {/* Header Component */}
-          <Header 
-            title="WheelFit" 
-            streak="28/30" 
-            subtitle="Adaptive Home Workouts" 
-          />
-
-          {/* Search Bar */}
-          <TextInput
-            style={styles.searchInput}
-            placeholder="Search workouts, plans..."
-            placeholderTextColor="#A9A9A9"
-          />
-
-          {/* Welcome User */}
-          <Text style={styles.welcomeText}>Welcome, User</Text>
-
-          {/* Featured Workouts */}
-          <Text style={styles.sectionTitle}>Featured Workouts</Text>
-          <View style={styles.featuredContainer}>
-            <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-              {/* First Featured Card */}
-              <TouchableOpacity style={styles.featuredCard}>
-                <Image source={require('@/assets/images/featured_workout.png')} style={styles.featuredImage} />
-                <Text style={styles.featuredText}>MASSIVE UPPER BODY</Text>
-                <Text style={styles.featuredDesc}>Lorem ipsum dolor sit amet, consectetur adipiscing elit.</Text>
-                <TouchableOpacity style={styles.startButton}>
-                  <Text style={styles.startButtonText}>Start</Text>
-                </TouchableOpacity>
-              </TouchableOpacity>
-
-              {/* Second Featured Card */}
-              <TouchableOpacity style={[styles.featuredCard, { marginLeft: 16 }]}>
-                <Image source={require('@/assets/images/featured_workout.png')} style={styles.featuredImage} />
-                <Text style={styles.featuredText}>LEGS & CORE BLAST</Text>
-                <Text style={styles.featuredDesc}>Push your limits with this intense workout for legs and core.</Text>
-                <TouchableOpacity style={styles.startButton}>
-                  <Text style={styles.startButtonText}>Start</Text>
-                </TouchableOpacity>
-              </TouchableOpacity>
-            </ScrollView>
-          </View>
-
-          {/* Quick Start Section */}
-          <View style={styles.quickStartContainer}>
-            <Text style={[styles.sectionTitle, styles.quickStartTitle]}>Quick Start</Text>
-            <Text style={styles.classicText}>Classic Workouts</Text>
-
-            <View style={styles.filterContainer}>
-              <Text style={styles.filterBadge}>Beginner</Text>
-              <Text style={styles.filterBadge}>Intermediate</Text>
-              <Text style={styles.filterBadge}>Advanced</Text>
-            </View>
-            <FlatList
-              data={workoutsData}
-              keyExtractor={(item, index) => index.toString()}
-              renderItem={renderWorkout}
-              style={styles.workoutsList}
-            />
-          </View>
-        </ScrollView>
+        <FlatList
+          data={workoutsData}
+          keyExtractor={(item, index) => index.toString()}
+          renderItem={renderWorkout}
+          ListHeaderComponent={
+            <>
+              <Header title="WheelFit" streak="28/30" subtitle="Adaptive Home Workouts" />
+              <TextInput style={styles.searchInput} placeholder="Search workouts, plans..." placeholderTextColor="#A9A9A9" />
+              <Text style={styles.welcomeText}>Welcome, User</Text>
+              <Text style={styles.sectionTitle}>Featured Workouts</Text>
+              <View style={styles.featuredContainer}>
+                <FlatList
+                  data={[
+                    {
+                      title: 'MASSIVE UPPER BODY',
+                      description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
+                      image: require('@/assets/images/featured_workout.png'),
+                    },
+                    {
+                      title: 'LEGS & CORE BLAST',
+                      description: 'Push your limits with this intense workout for legs and core.',
+                      image: require('@/assets/images/featured_workout.png'),
+                    },
+                  ]}
+                  horizontal
+                  showsHorizontalScrollIndicator={false}
+                  keyExtractor={(_, index) => index.toString()}
+                  renderItem={({ item }) => (
+                    <TouchableOpacity style={styles.featuredCard}>
+                      <Image source={item.image} style={styles.featuredImage} />
+                      <Text style={styles.featuredText}>{item.title}</Text>
+                      <Text style={styles.featuredDesc}>{item.description}</Text>
+                      <TouchableOpacity style={styles.startButton}>
+                        <Text style={styles.startButtonText}>Start</Text>
+                      </TouchableOpacity>
+                    </TouchableOpacity>
+                  )}
+                />
+              </View>
+              <Text style={[styles.sectionTitle, styles.quickStartTitle]}>Quick Start</Text>
+              <Text style={styles.classicText}>Classic Workouts</Text>
+              <View style={styles.filterContainer}>
+                <Text style={styles.filterBadge}>Beginner</Text>
+                <Text style={styles.filterBadge}>Intermediate</Text>
+                <Text style={styles.filterBadge}>Advanced</Text>
+              </View>
+            </>
+          }
+          contentContainerStyle={styles.workoutsList}
+        />
       </ThemedView>
     </SafeAreaView>
   );
 }
+
+
 
 const styles = StyleSheet.create({
   safeAreaContainer: {

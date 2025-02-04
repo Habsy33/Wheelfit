@@ -5,6 +5,8 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import SignUp from './SignUp';
 import SignIn from './SignIn';
 import ForgotPassword from './ForgotPassword';
+import Index from '../(tabs)/index';  
+
 
 const Stack = createStackNavigator();
 
@@ -15,6 +17,7 @@ const AppNavigator = () => {
         <Stack.Screen name="SignIn" component={SignIn} />
         <Stack.Screen name="SignUp" component={SignUp} />
         <Stack.Screen name="ForgotPassword" component={ForgotPassword} />
+        <Stack.Screen name="index" component={Index} />
       </Stack.Navigator>
     </NavigationContainer>
   );
@@ -24,6 +27,7 @@ export type RootStackParamList = {
     SignIn: undefined;
     SignUp: undefined;
     ForgotPassword: undefined;
+    Index: undefined;
   };
 
   // Define a type for navigation prop

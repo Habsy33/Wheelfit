@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   View,
   Text,
@@ -9,10 +9,40 @@ import {
 import { Ionicons, FontAwesome } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import { AuthNavigationProp } from './AppNavigation';
+import { signInWithEmailAndPassword } from "firebase/auth";
+import { auth } from "@/firebaseConfig";
+
 
 
 const SignIn: React.FC = () => {
   const navigation = useNavigation<AuthNavigationProp>(); 
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [errorMessage, setErrorMessage] = useState('');
+
+
+  const handleSignIn = async () => {
+    try {
+      if (!email || !password) {
+        setErrorMessage("Please enter both email and password.");
+        return;
+      }
+  
+      const userCredential = await signInWithEmailAndPassword(auth, email, password);
+      console.log("Signed in:", userCredential.user);
+  
+      // Navigate to the first tab (index.tsx inside (tabs))
+      navigation.reset({
+        index: 0,
+        routes: [{ name: "(tabs)" as never }], // TypeScript workaround
+      });
+  
+    } catch (error) {
+      console.error("Sign-in error:", error);
+      setErrorMessage((error as Error).message || "An unexpected error occurred.");
+    }
+  };
+  
 
   return (
     <View style={styles.container}>
@@ -27,8 +57,8 @@ const SignIn: React.FC = () => {
         <Text style={styles.subtitle}>Let’s personalize your fitness journey</Text>
       </View>
 
-      {/* Email Input */}
-      <View style={styles.inputContainer}>
+{/* Email Input */}
+        <View style={styles.inputContainer}>
         <FontAwesome name="envelope" size={18} color="#999" style={styles.icon} />
         <TextInput
           style={styles.input}
@@ -36,6 +66,8 @@ const SignIn: React.FC = () => {
           autoCapitalize="none"
           placeholder="Email Address"
           placeholderTextColor="#999"
+          value={email}
+          onChangeText={setEmail}
         />
       </View>
 
@@ -48,14 +80,13 @@ const SignIn: React.FC = () => {
           autoCapitalize="none"
           placeholder="Password"
           placeholderTextColor="#999"
+          value={password}
+          onChangeText={setPassword}
         />
-        <TouchableOpacity>
-          <Ionicons name="eye" size={18} color="#999" />
-        </TouchableOpacity>
       </View>
 
       {/* Sign In Button */}
-      <TouchableOpacity style={styles.signInButton}>
+      <TouchableOpacity style={styles.signInButton} onPress={handleSignIn}>
         <Text style={styles.signInText}>Sign In</Text>
         <Ionicons name="arrow-forward" size={20} color="#fff" />
       </TouchableOpacity>
@@ -73,21 +104,20 @@ const SignIn: React.FC = () => {
         </TouchableOpacity>
       </View>
 
-      {/* Footer */}
-      <View style={styles.footer}>
+       {/* Footer */}
+       <View style={styles.footer}>
         <Text style={styles.footerText}>
           Don’t have an account?{' '}
           <Text
-          style={styles.link}
-          onPress={() => navigation.navigate('SignUp')}
-        >
-          Sign Up
-        </Text>
+            style={styles.link}
+            onPress={() => navigation.navigate('SignUp')}
+          >
+            Sign Up
+          </Text>
         </Text>
         <TouchableOpacity onPress={() => navigation.navigate('ForgotPassword')}>
           <Text style={styles.link}>Forgot Password</Text>
         </TouchableOpacity>
-
       </View>
     </View>
   );
