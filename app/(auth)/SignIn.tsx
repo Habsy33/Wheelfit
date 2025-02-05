@@ -13,7 +13,6 @@ import { signInWithEmailAndPassword } from "firebase/auth";
 import { auth } from "@/firebaseConfig";
 
 
-
 const SignIn: React.FC = () => {
   const navigation = useNavigation<AuthNavigationProp>(); 
   const [email, setEmail] = useState('');

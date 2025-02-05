@@ -10,8 +10,8 @@ import { Ionicons, FontAwesome } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import { AuthNavigationProp } from './AppNavigation';
 import { createUserWithEmailAndPassword } from "firebase/auth";
-import { auth, db } from "@/firebaseConfig"; 
-import { doc, setDoc } from "firebase/firestore";
+import { auth, db, ref, set } from "@/firebaseConfig";
+
 
 const SignUp: React.FC = () => {
   const navigation = useNavigation<AuthNavigationProp>(); 
@@ -20,63 +20,52 @@ const SignUp: React.FC = () => {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
   const [fullName, setFullName] = useState('');
-const [email, setEmail] = useState('');
+  const [email, setEmail] = useState('');
 
-const handleSignUp = async () => {
-  try {
-    if (!email || !password || !confirmPassword || !fullName) {
-      setErrorMessage("Please fill in all fields.");
-      return;
+  const handleSignUp = async () => {
+    try {
+      if (!email || !password || !confirmPassword || !fullName) {
+        setErrorMessage("Please fill in all fields.");
+        return;
+      }
+
+      if (password !== confirmPassword) {
+        setErrorMessage("Passwords do not match.");
+        return;
+      }
+
+      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+      console.log('Signed up:', userCredential.user);
+
+      // Store user details in Realtime Database
+      const userRef = ref(db, `users/${userCredential.user.uid}`);
+      await set(userRef, {
+        fullName: fullName,
+        email: email,
+        createdAt: new Date().toISOString(),
+      });
+
+      // Navigate to the main app (tabs)
+      navigation.reset({
+        index: 0,
+        routes: [{ name: "(tabs)" as never }],
+      });
+
+    } catch (error) {
+      console.error('Error signing up:', error);
+      setErrorMessage((error as Error).message || "An unexpected error occurred.");
     }
-
-    if (password !== confirmPassword) {
-      setErrorMessage("Passwords do not match.");
-      return;
-    }
-
-    const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-    console.log('Signed up:', userCredential.user);
-
-    // Store user details in Firestore
-    const userDocRef = doc(db, 'users', userCredential.user.uid);
-    await setDoc(userDocRef, {
-      fullName: fullName,
-      email: email,
-      createdAt: new Date(),
-    });
-
-    // Navigate to the main app (tabs)
-    navigation.reset({
-      index: 0,
-      routes: [{ name: "(tabs)" as never }],
-    });
-
-  } catch (error) {
-    console.error('Error signing up:', error);
-    setErrorMessage((error as Error).message || "An unexpected error occurred.");
-  }
-};
-
-
-  
+  };
 
   return (
     <View style={styles.container}>
-      {/* Back Button */}
-      <TouchableOpacity
-        style={styles.backButton}
-        onPress={() => navigation.goBack()} // Navigate back to the previous screen
-      >
+      <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
         <Ionicons name="chevron-back" size={24} color="#000" />
       </TouchableOpacity>
-
-      {/* Header */}
       <View style={styles.header}>
         <Text style={styles.title}>Sign Up For Free</Text>
         <Text style={styles.subtitle}>Quickly make your account in 1 minute</Text>
       </View>
-
-      {/* Full Name Input */}
       <View style={styles.inputContainer}>
         <Ionicons name="person" size={18} color="#999" style={styles.icon} />
         <TextInput
@@ -87,8 +76,6 @@ const handleSignUp = async () => {
           onChangeText={setFullName}
         />
       </View>
-
-      {/* Email Input */}
       <View style={styles.inputContainer}>
         <FontAwesome name="envelope" size={18} color="#999" style={styles.icon} />
         <TextInput
@@ -100,8 +87,6 @@ const handleSignUp = async () => {
           onChangeText={setEmail}
         />
       </View>
-
-      {/* Password Input */}
       <View style={styles.inputContainer}>
         <Ionicons name="lock-closed" size={18} color="#999" style={styles.icon} />
         <TextInput
@@ -112,12 +97,7 @@ const handleSignUp = async () => {
           placeholderTextColor="#999"
           onChangeText={setPassword}
         />
-        <TouchableOpacity>
-          <Ionicons name="eye" size={18} color="#999" />
-        </TouchableOpacity>
       </View>
-
-      {/* Confirm Password Input */}
       <View style={styles.inputContainer}>
         <Ionicons name="lock-closed" size={18} color="#999" style={styles.icon} />
         <TextInput
@@ -128,34 +108,14 @@ const handleSignUp = async () => {
           placeholderTextColor="#999"
           onChangeText={setConfirmPassword}
         />
-        <TouchableOpacity>
-          <Ionicons name="eye" size={18} color="#999" />
-        </TouchableOpacity>
       </View>
-
-      {/* Error Message */}
       {errorMessage ? (
         <Text style={styles.errorText}>{errorMessage}</Text>
       ) : null}
-
-      {/* Sign Up Button */}
       <TouchableOpacity style={styles.signUpButton} onPress={handleSignUp}>
         <Text style={styles.signUpText}>Sign Up</Text>
         <Ionicons name="arrow-forward" size={20} color="#fff" />
       </TouchableOpacity>
-
-      {/* Footer */}
-      <View style={styles.footer}>
-        <Text style={styles.footerText}>
-          Already have an account?{' '}
-          <Text
-            style={styles.link}
-            onPress={() => navigation.navigate('SignIn')} // Navigate to the SignIn screen
-          >
-            Sign In
-          </Text>
-        </Text>
-      </View>
     </View>
   );
 };

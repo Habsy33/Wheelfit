@@ -51,6 +51,11 @@ const workoutsData = [
 
 function Workouts() {
   const colorScheme = useColorScheme();
+  const [selectedLevel, setSelectedLevel] = useState<string | null>(null);
+  
+  const filteredWorkouts = selectedLevel
+    ? workoutsData.filter(workout => workout.level === selectedLevel)
+    : workoutsData;
 
   const renderWorkout = ({ item }: any) => (
     <TouchableOpacity style={styles.workoutCard}>
@@ -68,7 +73,7 @@ function Workouts() {
     <SafeAreaView style={styles.safeAreaContainer}>
       <ThemedView style={styles.container}>
         <FlatList
-          data={workoutsData}
+          data={filteredWorkouts}
           keyExtractor={(item, index) => index.toString()}
           renderItem={renderWorkout}
           ListHeaderComponent={
@@ -106,12 +111,18 @@ function Workouts() {
                   )}
                 />
               </View>
-              <Text style={[styles.sectionTitle, styles.quickStartTitle]}>Quick Start</Text>
+              <Text style={[styles.sectionTitle, styles.quickStartTitle]}>QUICK START</Text>
               <Text style={styles.classicText}>Classic Workouts</Text>
               <View style={styles.filterContainer}>
-                <Text style={styles.filterBadge}>Beginner</Text>
-                <Text style={styles.filterBadge}>Intermediate</Text>
-                <Text style={styles.filterBadge}>Advanced</Text>
+                {['Beginner', 'Intermediate', 'Advanced'].map(level => (
+                  <TouchableOpacity
+                    key={level}
+                    style={[styles.filterBadge, selectedLevel === level && styles.activeFilter]}
+                    onPress={() => setSelectedLevel(selectedLevel === level ? null : level)}
+                  >
+                    <Text style={styles.filterBadgeText}>{level}</Text>
+                  </TouchableOpacity>
+                ))}
               </View>
             </>
           }
@@ -121,6 +132,7 @@ function Workouts() {
     </SafeAreaView>
   );
 }
+
 
 
 
@@ -147,18 +159,19 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: 'bold',
     marginBottom: 1,
-    padding: 10,
+    padding: 7,
   },
   featuredContainer: {
     marginTop: 0,
     marginBottom: 10,
-    padding: 5,
+    padding: 4.5,
   },
   featuredCard: {
     backgroundColor: '#4476d8',
     borderRadius: 15,
     padding: 10,
-    width: 250,
+    width: 275,
+    marginRight: 15,
   },
   featuredImage: {
     width: '100%',
@@ -190,7 +203,10 @@ const styles = StyleSheet.create({
     marginTop: 6,
   },
   quickStartTitle: {
-    color: '#333',
+    // color: '#333',
+    margin: 1,
+    fontSize: 15,
+    
   },
   filterContainer: {
     flexDirection: 'row',
@@ -199,8 +215,12 @@ const styles = StyleSheet.create({
     marginTop: 0,
     padding: 10,
   },
+  activeFilter: {
+    backgroundColor: '#007BFF', // Change to your theme color
+    borderColor: '#007AFF',
+  },
   filterBadge: {
-    backgroundColor: '#007BFF',
+    backgroundColor: '#FFF',
     color: '#FFF',
     paddingVertical: 7,
     paddingHorizontal: 15,
@@ -208,6 +228,12 @@ const styles = StyleSheet.create({
     fontSize: 14,
     textAlign: 'center',
     fontWeight: 'bold',
+    margin: -1,
+  },
+  filterBadgeText: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: '#000',
   },
   workoutsList: {
     marginTop: -5,
@@ -247,19 +273,19 @@ const styles = StyleSheet.create({
   classicText: {
     fontSize: 20,
     fontWeight: 'bold',
-    color: '#333',
+    // color: '#333',
     marginTop: -10,
     marginBottom: -5,
     textAlign: 'left',
-    padding: 10,
+    padding: 8,
   },
   welcomeText: {
     fontSize: 30,
     fontWeight: 'bold',
-    color: '#333',
+    // color: '#333',
     marginTop: 0,
     marginBottom: -5,
     textAlign: 'left',
-    padding: 10,
+    padding: 6,
   },
 });

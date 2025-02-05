@@ -14,6 +14,12 @@ import { ThemedText } from '@/components/ThemedText';
 import { useColorScheme } from '@/hooks/useColorScheme';
 import { WebView } from 'react-native-webview';
 import { Header } from '@/components/Header'; // Importing the Header component
+import MapView, { Marker } from 'react-native-maps';
+import Constants from 'expo-constants';
+
+// import { GOOGLE_MAPS_API_KEY } from "@env";
+// console.log(GOOGLE_MAPS_API_KEY); // Check if it's loading correctly
+
 
 const eventsData = [
   {
@@ -41,6 +47,12 @@ const fitnessCentersData = [
 export default function NearYou() {
   const colorScheme = useColorScheme();
 
+  // const GOOGLE_MAPS_API_KEY = process.env.EXPO_PUBLIC_GOOGLE_MAPS_API_KEY;
+
+
+  const GOOGLE_MAPS_API_KEY = Constants.expoConfig?.extra?.GOOGLE_MAPS_API_KEY;
+  console.log('Google Maps API Key:', GOOGLE_MAPS_API_KEY);
+
   const renderEventCard = (event: any) => (
     <View style={styles.eventCard} key={event.title}>
       <View style={styles.smallBox}>
@@ -67,48 +79,27 @@ export default function NearYou() {
   return (
     <SafeAreaView style={styles.safeArea}>
       <ThemedView style={styles.container}>
-        {/* Updated Header */}
-        <Header
-          streak="7/7"
-          title="WheelFit"
-          subtitle="Find Events and Centers Near You"
-        />
-
-                  {/* Search Bar */}
-                  <TextInput
-                    style={styles.searchInput}
-                    placeholder="Search workouts, plans..."
-                    placeholderTextColor="#A9A9A9"
-                  />
+        <Header streak="7/7" title="WheelFit" subtitle="Find Events and Centers Near You" />
+        <TextInput style={styles.searchInput} placeholder="Search workouts, plans..." placeholderTextColor="#A9A9A9" />
         <ScrollView style={styles.content}>
           <Text style={styles.sectionTitle}>Events Near You</Text>
           <Text style={styles.featuredText}>Featured Events</Text>
-          <View style={styles.eventsContainer}>
-            {eventsData.map(renderEventCard)}
-          </View>
+          <View style={styles.eventsContainer}>{eventsData.map(renderEventCard)}</View>
           <Text style={styles.sectionSubtitle}>Search Local Fitness Centers</Text>
           <View style={styles.mapContainer}>
-            <WebView
-              source={{
-                uri: 'https://www.google.com/maps/embed/v1/place?key=YOUR_GOOGLE_MAPS_API_KEY&q=wheelchair+accessible+fitness+centers+near+me',
-              }}
+            <MapView
               style={styles.map}
-            />
+              initialRegion={{ latitude: 55.8642, longitude: -4.2518, latitudeDelta: 0.1, longitudeDelta: 0.1 }}
+            >
+              <Marker coordinate={{ latitude: 55.8642, longitude: -4.2518 }} title="Glasgow" />
+            </MapView>
           </View>
           <View style={styles.filterContainer}>
-            <TouchableOpacity style={styles.filterButton}>
-              <Text style={styles.filterButtonText}>Accessible Venues</Text>
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.filterButton}>
-              <Text style={styles.filterButtonText}>Parks</Text>
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.filterButton}>
-              <Text style={styles.filterButtonText}>Close by</Text>
-            </TouchableOpacity>
+            <TouchableOpacity style={styles.filterButton}><Text style={styles.filterButtonText}>Accessible Venues</Text></TouchableOpacity>
+            <TouchableOpacity style={styles.filterButton}><Text style={styles.filterButtonText}>Parks</Text></TouchableOpacity>
+            <TouchableOpacity style={styles.filterButton}><Text style={styles.filterButtonText}>Close by</Text></TouchableOpacity>
           </View>
-          <View style={styles.fitnessCentersContainer}>
-            {fitnessCentersData.map(renderFitnessCenterCard)}
-          </View>
+          <View style={styles.fitnessCentersContainer}>{fitnessCentersData.map(renderFitnessCenterCard)}</View>
         </ScrollView>
       </ThemedView>
     </SafeAreaView>
@@ -210,14 +201,8 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: '#555',
   },
-  mapContainer: {
-    height: 200,
-    marginVertical: 16,
-  },
-  map: {
-    flex: 1,
-    borderRadius: 8,
-  },
+  mapContainer: { width: '100%', height: 200, borderRadius: 8, overflow: 'hidden', marginVertical: 10, padding: 10, },
+  map: { width: '100%', height: '100%' , borderRadius: 20},
   filterContainer: {
     flexDirection: 'row',
     justifyContent: 'space-around',
