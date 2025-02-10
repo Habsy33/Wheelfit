@@ -101,6 +101,27 @@ const Explore = () => {
               You're on a <Text style={styles.highlight}>{dailyStreak}-day</Text> streak of exercising daily!
             </Text>
           </View>
+          </View>
+
+          {/* Daily Streak Card */}
+        <View style={styles.card}>
+          <Text style={styles.cardTitle}>Change the text soon</Text>
+          <View style={styles.streakRow}>
+            <MaterialCommunityIcons name="run" size={48} color="#32CD32" />
+            <Text style={styles.streakText}>
+              You're on a <Text style={styles.highlight}>{dailyStreak}-day</Text> streak of exercising daily!
+            </Text>
+          </View>
+        </View>
+
+        <View style={styles.card}>
+          <Text style={styles.cardTitle}>Change the text soon</Text>
+          <View style={styles.streakRow}>
+            <MaterialCommunityIcons name="run" size={48} color="#32CD32" />
+            <Text style={styles.streakText}>
+              You're on a <Text style={styles.highlight}>{dailyStreak}-day</Text> streak of exercising daily!
+            </Text>
+          </View>
         </View>
       </ScrollView>
     </View>

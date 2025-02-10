@@ -95,6 +95,22 @@ const Forum: React.FC = () => {
       location: 'Scottish Disability Sport, Scotland, United Kingdom',
       format: 'In Person',
     },
+    {
+      id: '5',
+      type: 'meetup',
+      date: 'JUL 13',
+      title: 'SDS Summer Camp 2025',
+      location: 'Scottish Disability Sport, Scotland, United Kingdom',
+      format: 'In Person',
+    },
+    {
+      id: '6',
+      type: 'meetup',
+      date: 'JUL 13',
+      title: 'SDS Summer Camp 2025',
+      location: 'Scottish Disability Sport, Scotland, United Kingdom',
+      format: 'In Person',
+    },
   ];
 
   const combinedData: ForumItem[] = [

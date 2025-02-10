@@ -21,24 +21,36 @@ const SignIn: React.FC = () => {
 
 
   const handleSignIn = async () => {
-    try {
-      if (!email || !password) {
-        setErrorMessage("Please enter both email and password.");
-        return;
-      }
+    setErrorMessage(""); // Clear previous error messages
   
+    if (!email || !password) {
+      setErrorMessage("Please enter both email and password.");
+      return;
+    }
+  
+    try {
       const userCredential = await signInWithEmailAndPassword(auth, email, password);
       console.log("Signed in:", userCredential.user);
   
-      // Navigate to the first tab (index.tsx inside (tabs))
+      // Navigate to the main app
       navigation.reset({
         index: 0,
-        routes: [{ name: "(tabs)" as never }], // TypeScript workaround
+        routes: [{ name: "(tabs)" as never }],
       });
   
-    } catch (error) {
+    } catch (error: any) {
       console.error("Sign-in error:", error);
-      setErrorMessage((error as Error).message || "An unexpected error occurred.");
+  
+      // Handle Firebase Auth errors
+      if (error.code === "auth/user-not-found" || error.code === "auth/wrong-password") {
+        setErrorMessage("Incorrect email or password. Try again or reset your password.");
+      } else if (error.code === "auth/invalid-email") {
+        setErrorMessage("Please enter a valid email address.");
+      } else if (error.code === "auth/too-many-requests") {
+        setErrorMessage("Too many failed attempts. Please try again later.");
+      } else {
+        setErrorMessage("An unexpected error occurred. Please try again.");
+      }
     }
   };
   
@@ -46,7 +58,7 @@ const SignIn: React.FC = () => {
   return (
     <View style={styles.container}>
       {/* Back button */}
-      <TouchableOpacity style={styles.backButton}>
+      <TouchableOpacity style={styles.backButton} onPress={() => navigation.replace('SplashScreenTwo')}>
         <Ionicons name="chevron-back" size={24} color="#000" />
       </TouchableOpacity>
 
@@ -83,6 +95,10 @@ const SignIn: React.FC = () => {
           onChangeText={setPassword}
         />
       </View>
+
+      {errorMessage ? (
+          <Text style={styles.errorText}>{errorMessage}</Text>
+        ) : null}
 
       {/* Sign In Button */}
       <TouchableOpacity style={styles.signInButton} onPress={handleSignIn}>
@@ -134,6 +150,12 @@ const styles = StyleSheet.create({
     top: 40,
     left: 20,
   },
+  errorText: {
+    color: "#FF0000",
+    fontSize: 14,
+    textAlign: "center",
+    marginBottom: 10,
+  },  
   header: {
     alignItems: 'center',
     marginBottom: 40,

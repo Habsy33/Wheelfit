@@ -42,6 +42,21 @@ const fitnessCentersData = [
     details: '6am - 10pm / 7D/Week / Wheelchair Accessible / Free Parking',
     image: require('@/assets/images/fitness_center.png'),
   },
+  {
+    name: 'Wellness Glasgow',
+    details: '6am - 10pm / 7D/Week / Wheelchair Accessible / Free Parking',
+    image: require('@/assets/images/fitness_center.png'),
+  },
+  {
+    name: 'Accessibility+ Glasgow',
+    details: '6am - 10pm / 7D/Week / Wheelchair Accessible / Free Parking',
+    image: require('@/assets/images/fitness_center.png'),
+  },
+  {
+    name: 'Powerhouse Glasgow',
+    details: '6am - 10pm / 7D/Week / Wheelchair Accessible / Free Parking',
+    image: require('@/assets/images/fitness_center.png'),
+  },
 ];
 
 export default function NearYou() {
@@ -233,6 +248,7 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 2 },
     elevation: 2,
   },
+  
   fitnessCenterImage: {
     width: 60,
     height: 60,
@@ -257,3 +273,4 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
 });
+ 

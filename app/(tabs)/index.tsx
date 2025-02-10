@@ -35,7 +35,7 @@ export default function Index() {
   }
 
   if (!user) {
-    return <Redirect href="../(auth)/SignIn" />;
+    return <Redirect href="../(auth)/SplashScreen" />;
   }
 
   return <Workouts />;
@@ -72,14 +72,14 @@ function Workouts() {
   return (
     <SafeAreaView style={styles.safeAreaContainer}>
       <ThemedView style={styles.container}>
+      <Header title="WheelFit" streak="28/30" subtitle="Adaptive Home Workouts" />
+      <TextInput style={styles.searchInput} placeholder="Search workouts, plans..." placeholderTextColor="#A9A9A9" />
         <FlatList
           data={filteredWorkouts}
           keyExtractor={(item, index) => index.toString()}
           renderItem={renderWorkout}
           ListHeaderComponent={
             <>
-              <Header title="WheelFit" streak="28/30" subtitle="Adaptive Home Workouts" />
-              <TextInput style={styles.searchInput} placeholder="Search workouts, plans..." placeholderTextColor="#A9A9A9" />
               <Text style={styles.welcomeText}>Welcome, User</Text>
               <Text style={styles.sectionTitle}>Featured Workouts</Text>
               <View style={styles.featuredContainer}>

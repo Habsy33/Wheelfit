@@ -10,7 +10,9 @@ import { Ionicons, FontAwesome } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import { AuthNavigationProp } from './AppNavigation';
 import { createUserWithEmailAndPassword } from "firebase/auth";
-import { auth, db, ref, set } from "@/firebaseConfig";
+import { auth, db, ref, set, get } from "@/firebaseConfig";
+
+
 
 
 const SignUp: React.FC = () => {
@@ -21,45 +23,73 @@ const SignUp: React.FC = () => {
   const [errorMessage, setErrorMessage] = useState('');
   const [fullName, setFullName] = useState('');
   const [email, setEmail] = useState('');
+  const [username, setUsername] = useState('');
 
   const handleSignUp = async () => {
     try {
-      if (!email || !password || !confirmPassword || !fullName) {
+      if (!email || !username || !password || !confirmPassword || !fullName) {
         setErrorMessage("Please fill in all fields.");
         return;
       }
-
+  
       if (password !== confirmPassword) {
         setErrorMessage("Passwords do not match.");
         return;
       }
-
+  
+      // Check if username is already taken
+      const usernameRef = ref(db, `usernames/${username}`);
+      const snapshot = await get(usernameRef);
+  
+      if (snapshot.exists()) {
+        setErrorMessage("Username already taken. Choose another.");
+        return;
+      }
+  
+      // Create user in Firebase Authentication
       const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-      console.log('Signed up:', userCredential.user);
-
+      console.log("Signed up:", userCredential.user);
+  
+      const userId = userCredential.user.uid;
+  
       // Store user details in Realtime Database
-      const userRef = ref(db, `users/${userCredential.user.uid}`);
+      const userRef = ref(db, `users/${userId}`);
       await set(userRef, {
-        fullName: fullName,
-        email: email,
+        fullName,
+        username,
+        email,
         createdAt: new Date().toISOString(),
       });
-
-      // Navigate to the main app (tabs)
+  
+      // Store username to prevent duplicates
+      const usernameRefToSet = ref(db, `usernames/${username}`);
+      await set(usernameRefToSet, { userId });
+  
+      // Navigate to the main app
       navigation.reset({
         index: 0,
         routes: [{ name: "(tabs)" as never }],
       });
-
-    } catch (error) {
-      console.error('Error signing up:', error);
-      setErrorMessage((error as Error).message || "An unexpected error occurred.");
+  
+    } catch (error: any) {
+      console.error("Error signing up:", error);
+  
+      if (error.code === "auth/email-already-in-use") {
+        setErrorMessage("This email is already registered. Try logging in instead.");
+      } else if (error.code === "auth/invalid-email") {
+        setErrorMessage("Please enter a valid email address.");
+      } else if (error.code === "auth/weak-password") {
+        setErrorMessage("Password should be at least 6 characters.");
+      } else {
+        setErrorMessage(error.message || "An unexpected error occurred.");
+      }
     }
   };
+  
 
   return (
     <View style={styles.container}>
-      <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
+      <TouchableOpacity style={styles.backButton} onPress={() => navigation.replace('SignIn')}>
         <Ionicons name="chevron-back" size={24} color="#000" />
       </TouchableOpacity>
       <View style={styles.header}>
@@ -74,6 +104,16 @@ const SignUp: React.FC = () => {
           placeholder="Full Name"
           placeholderTextColor="#999"
           onChangeText={setFullName}
+        />
+      </View>
+      <View style={styles.inputContainer}>
+        <Ionicons name="at" size={18} color="#999" style={styles.icon} />
+        <TextInput
+          style={styles.input}
+          autoCapitalize="none"
+          placeholder="Username"
+          placeholderTextColor="#999"
+          onChangeText={setUsername}
         />
       </View>
       <View style={styles.inputContainer}>
