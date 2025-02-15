@@ -230,7 +230,7 @@ const styles = StyleSheet.create({
   headerWrapper: {
     position: 'relative', // Allows adjustment of header position if needed
     marginBottom: -5, // You can adjust this for spacing
-    marginTop: -50,
+    marginTop: -60,
   },
   searchBar: {
     flexDirection: 'row',

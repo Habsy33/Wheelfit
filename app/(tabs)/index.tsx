@@ -16,10 +16,17 @@ import { Header } from '@/components/Header';
 import { Redirect } from 'expo-router';
 import { auth } from '@/firebaseConfig';
 import { onAuthStateChanged, User } from 'firebase/auth';
+import { useNavigation } from '@react-navigation/native';
+import { AuthNavigationProp } from '../(auth)/AppNavigation';
+import { useRouter } from 'expo-router';
+
 
 export default function Index() {
+
+  const router = useRouter();
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
+  const navigation = useNavigation<AuthNavigationProp>();
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (authenticatedUser) => {
@@ -36,7 +43,7 @@ export default function Index() {
 
   if (!user) {
     return <Redirect href="../(auth)/SplashScreen" />;
-  }
+  }  
 
   return <Workouts />;
 }
@@ -46,19 +53,31 @@ const workoutsData = [
   { title: 'Chest - Easy', duration: '15 mins', level: 'Beginner', image: require('@/assets/images/chest.png') },
   { title: 'Shoulder & Back - Intermediate', duration: '15 mins', level: 'Intermediate', image: require('@/assets/images/shoulder_back.png') },
   { title: 'Arms - Intermediate', duration: '15 mins', level: 'Intermediate', image: require('@/assets/images/arms.png') },
-  { title: 'Follow Along - Advanced', duration: '15 mins', level: 'Advanced', image: require('@/assets/images/arms.png') },
+  { title: 'Follow Along - Advanced', duration: '15 mins', level: 'Advanced', image: require('@/assets/images/follow_along.jpg') },
+  { title: 'Full Body Stretch - Easy', duration: '15 mins', level: 'Beginner', image: require('@/assets/images/chest.png') },
+  { title: 'Follow Along - Advanced', duration: '15 mins', level: 'Advanced', image: require('@/assets/images/follow_along.jpg') },
 ];
 
 function Workouts() {
+  const navigation = useNavigation<AuthNavigationProp>(); 
   const colorScheme = useColorScheme();
   const [selectedLevel, setSelectedLevel] = useState<string | null>(null);
-  
+  const router = useRouter();
+
   const filteredWorkouts = selectedLevel
     ? workoutsData.filter(workout => workout.level === selectedLevel)
     : workoutsData;
 
+
+
+
   const renderWorkout = ({ item }: any) => (
-    <TouchableOpacity style={styles.workoutCard}>
+    <TouchableOpacity style={styles.workoutCard}
+        
+    // onPress={() => navigation.navigate('GuideScreen2')}
+    
+    onPress={() => router.push('../expanded-pages/FeaturedGuides')}>
+      
       <Image source={item.image} style={styles.workoutImage} />
       <View style={styles.workoutDetails}>
         <Text style={styles.workoutTitle}>{item.title}</Text>
@@ -88,12 +107,17 @@ function Workouts() {
                     {
                       title: 'MASSIVE UPPER BODY',
                       description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
-                      image: require('@/assets/images/featured_workout.png'),
+                      image: require('@/assets/images/chest1.png'),
                     },
                     {
                       title: 'LEGS & CORE BLAST',
                       description: 'Push your limits with this intense workout for legs and core.',
-                      image: require('@/assets/images/featured_workout.png'),
+                      image: require('@/assets/images/chest1.png'),
+                    },
+                    {
+                      title: 'MASSIVE UPPER BODY',
+                      description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
+                      image: require('@/assets/images/chest1.png'),
                     },
                   ]}
                   horizontal
@@ -104,7 +128,12 @@ function Workouts() {
                       <Image source={item.image} style={styles.featuredImage} />
                       <Text style={styles.featuredText}>{item.title}</Text>
                       <Text style={styles.featuredDesc}>{item.description}</Text>
-                      <TouchableOpacity style={styles.startButton}>
+                      <TouchableOpacity style={styles.startButton}
+                      
+                      // onPress={() => navigation.navigate('FeaturedGuides')}
+
+                      onPress={() => router.push('../expanded-pages/FeaturedGuides')}>
+                                            
                         <Text style={styles.startButtonText}>Start</Text>
                       </TouchableOpacity>
                     </TouchableOpacity>
@@ -140,7 +169,7 @@ const styles = StyleSheet.create({
   safeAreaContainer: {
     flex: 1,
     backgroundColor: '#F1F0F0', // Matches the app background
-    marginTop: -50,
+    marginTop: -60,
   },
   container: {
     flex: 1,
@@ -158,28 +187,28 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 18,
     fontWeight: 'bold',
-    marginBottom: 1,
+    marginBottom: 7,
     padding: 7,
   },
   featuredContainer: {
     marginTop: 0,
     marginBottom: 10,
-    padding: 4.5,
+    padding: -1,
   },
   featuredCard: {
     backgroundColor: '#4476d8',
     borderRadius: 15,
     padding: 10,
-    width: 275,
-    marginRight: 15,
+    width: 300,
+    marginRight: 10,
   },
   featuredImage: {
     width: '100%',
-    height: 100,
+    height: 150,
     borderRadius: 8,
   },
   featuredText: {
-    marginTop: 8,
+    marginTop: 12,
     fontWeight: 'bold',
     fontSize: 16,
   },
@@ -252,6 +281,7 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 2 },
     elevation: 2,
   },
+  
   workoutImage: {
     width: 60,
     height: 60,
@@ -283,7 +313,7 @@ const styles = StyleSheet.create({
     fontSize: 30,
     fontWeight: 'bold',
     // color: '#333',
-    marginTop: 0,
+    marginTop: -10,
     marginBottom: -5,
     textAlign: 'left',
     padding: 6,

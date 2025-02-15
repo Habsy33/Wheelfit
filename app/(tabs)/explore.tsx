@@ -132,7 +132,7 @@ const styles = StyleSheet.create({
   wrapper: {
     flex: 1,
     backgroundColor: '#f9f9f9',
-    marginTop: -49,
+    marginTop: -60,
   },
   container: {
     flex: 1,
