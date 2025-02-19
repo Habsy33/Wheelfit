@@ -16,6 +16,7 @@ import { Header } from '@/components/Header'; // Importing the Header component
 import MapView, { Marker } from 'react-native-maps';
 import Constants from 'expo-constants';
 import React, { useState } from 'react';
+import { useRouter } from 'expo-router';
 
 // import { GOOGLE_MAPS_API_KEY } from "@env";
 // console.log(GOOGLE_MAPS_API_KEY); // Check if it's loading correctly
@@ -57,6 +58,7 @@ const fitnessCentersData = [
 
 export default function NearYou() {
   const colorScheme = useColorScheme();
+  const router = useRouter();
 
   // const GOOGLE_MAPS_API_KEY = process.env.EXPO_PUBLIC_GOOGLE_MAPS_API_KEY;
 
@@ -65,17 +67,19 @@ export default function NearYou() {
   console.log('Google Maps API Key:', GOOGLE_MAPS_API_KEY);
 
   const renderEventCard = (event: any) => (
-    <View style={styles.eventCard} key={event.title}>
-      <View style={styles.smallBox}>
-        <Text style={styles.smallBoxText}>20/02/25</Text>
-      </View>
-      <Image source={event.image} style={styles.eventImage} />
-      <Text style={styles.eventDate}>{event.date}</Text>
-      <Text style={styles.eventTitle}>{event.title}</Text>
-      <Text style={styles.eventDescription}>{event.description}</Text>
+    <TouchableOpacity 
+    key={event.title} 
+    style={styles.eventCard} 
+    onPress={() => router.push('../expanded-pages/FeaturedEvents')}>
+    <View style={styles.smallBox}>
+      <Text style={styles.smallBoxText}>20/02/25</Text>
     </View>
+    <Image source={event.image} style={styles.eventImage} />
+    <Text style={styles.eventDate}>{event.date}</Text>
+    <Text style={styles.eventTitle}>{event.title}</Text>
+    <Text style={styles.eventDescription}>{event.description}</Text>
+  </TouchableOpacity>
   );
-  
 
   const renderFitnessCenterCard = (center: any) => (
     <View style={styles.fitnessCenterCard} key={center.name}>
@@ -110,9 +114,7 @@ export default function NearYou() {
           <Text style={styles.sectionTitle}>Events Near You</Text>
           <Text style={styles.featuredText}>Featured Events</Text>
           <ScrollView horizontal={true} showsHorizontalScrollIndicator={false} contentContainerStyle={styles.eventsContainer}>
-          <TouchableOpacity>
           <View style={styles.eventsContainer}>{eventsData.map(renderEventCard)}</View>
-          </TouchableOpacity>
           </ScrollView>
           <Text style={styles.sectionSubtitle}>Search Local Fitness Centers</Text>
           <View style={styles.mapContainer}>

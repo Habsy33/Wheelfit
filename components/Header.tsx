@@ -33,7 +33,7 @@ const styles = StyleSheet.create({
     marginHorizontal: -2, // Adds some spacing on the sides
   },
   headerContainer: {
-    marginTop: 43,
+    marginTop: 45,
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',

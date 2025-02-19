@@ -10,6 +10,7 @@ import {
 } from 'react-native';
 import { MaterialIcons, FontAwesome } from '@expo/vector-icons';
 import { Header } from '@/components/Header'; // Importing the Header component
+import { useRouter } from 'expo-router';
 
 // Define types for the items in the FlatList
 interface Post {
@@ -55,6 +56,8 @@ interface HeaderItem {
 type ForumItem = Post | Meetup | SearchItem | FilterItem | CreatePostItem | HeaderItem;
 
 const Forum: React.FC = () => {
+  const router = useRouter();
+
   const posts: Post[] = [
     {
       id: '1',
@@ -167,6 +170,7 @@ const Forum: React.FC = () => {
         );
       case 'post':
         return (
+          <TouchableOpacity style={styles.postContainer} onPress={() => router.push(`../expanded-pages/discussionPage?id=${item.id}`)}>
           <View style={styles.postContainer}>
             <Text style={styles.postTitle}>{item.title}</Text>
             <View style={styles.tagsContainer}>
@@ -180,22 +184,27 @@ const Forum: React.FC = () => {
               {item.views} • {item.likes} • {item.comments}
             </Text>
           </View>
+          </TouchableOpacity>
         );
       case 'header':
         return <Text style={styles.meetupsHeader}>Meetups →</Text>;
       case 'meetup':
         return (
-          <View style={styles.meetupContainer}>
-            <View style={styles.meetupDate}>
-              <Text style={styles.meetupMonth}>{item.date.split(' ')[0]}</Text>
-              <Text style={styles.meetupDay}>{item.date.split(' ')[1]}</Text>
+          <TouchableOpacity
+            onPress={() => router.push(`/expanded-pages/MeetupsPage?id=${item.id}&date=${item.date}&title=${item.title}&location=${item.location}&format=${item.format}`)}
+          >
+            <View style={styles.meetupContainer}>
+              <View style={styles.meetupDate}>
+                <Text style={styles.meetupMonth}>{item.date.split(' ')[0]}</Text>
+                <Text style={styles.meetupDay}>{item.date.split(' ')[1]}</Text>
+              </View>
+              <View style={styles.meetupInfo}>
+                <Text style={styles.meetupTitle}>{item.title}</Text>
+                <Text style={styles.meetupLocation}>{item.location}</Text>
+                <Text style={styles.meetupFormat}>{item.format}</Text>
+              </View>
             </View>
-            <View style={styles.meetupInfo}>
-              <Text style={styles.meetupTitle}>{item.title}</Text>
-              <Text style={styles.meetupLocation}>{item.location}</Text>
-              <Text style={styles.meetupFormat}>{item.format}</Text>
-            </View>
-          </View>
+          </TouchableOpacity>
         );
       default:
         return null;
@@ -209,7 +218,7 @@ const Forum: React.FC = () => {
         <Header
           streak="28/30"
           title="WheelFit"
-          subtitle="Adaptive Home Workouts"
+          subtitle="Adaptive Fitness Forum"
         />
       </View>
       <FlatList
@@ -221,6 +230,7 @@ const Forum: React.FC = () => {
     </View>
   );
 };
+
 const styles = StyleSheet.create({
   container: {
     backgroundColor: '#f9f9f9',
@@ -230,7 +240,7 @@ const styles = StyleSheet.create({
   headerWrapper: {
     position: 'relative', // Allows adjustment of header position if needed
     marginBottom: -5, // You can adjust this for spacing
-    marginTop: -60,
+    marginTop: -50,
   },
   searchBar: {
     flexDirection: 'row',

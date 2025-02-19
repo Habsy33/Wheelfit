@@ -5,7 +5,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { Header } from '@/components/Header';
 import { useLocalSearchParams } from 'expo-router';
 
-const FeaturedGuides = () => {
+const FeaturedEvents = () => {
   const navigation = useNavigation();
   const { title, duration, level, image, description, equipment, intensity } = useLocalSearchParams(); 
 
@@ -30,7 +30,7 @@ const FeaturedGuides = () => {
           style={styles.heroImage}
         />
         <View style={styles.overlay}>
-          <Text style={styles.workoutTitle}>{title || "Adaptive Strength Workout"}</Text>
+          <Text style={styles.workoutTitle}>{title || "Featured Events"}</Text>
           <Text style={styles.workoutDescription}>
             {duration ? `${duration} • ${level}` : "Build core strength, improve mobility, and stay active."}
           </Text>
@@ -39,7 +39,7 @@ const FeaturedGuides = () => {
 
       {/* Workout Description */}
       <View style={styles.descriptionContainer}>
-        <Text style={styles.sectionTitle}>About This Workout</Text>
+        <Text style={styles.sectionTitle}>About This Event</Text>
         <Text style={styles.sectionText}>{description || "A 4-week fitness plan designed for wheelchair users, focusing on upper body strength, endurance, and core stability. No gym required!"}</Text>
       </View>
 
@@ -62,7 +62,7 @@ const FeaturedGuides = () => {
       {/* Start Workout Button */}
       <View style={styles.startButtonContainer}>
         <TouchableOpacity style={styles.startButton}>
-          <Text style={styles.startButtonText}>Start Workout</Text>
+          <Text style={styles.startButtonText}>I'm Going!</Text>
         </TouchableOpacity>
       </View>
     </View>
@@ -161,4 +161,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default FeaturedGuides;
+export default FeaturedEvents;

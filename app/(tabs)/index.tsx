@@ -74,10 +74,11 @@ function Workouts() {
   const renderWorkout = ({ item }: any) => (
     <TouchableOpacity style={styles.workoutCard}
         
-    // onPress={() => navigation.navigate('GuideScreen2')}
-    
-    onPress={() => router.push('../expanded-pages/FeaturedGuides')}>
-      
+    onPress={() => router.push({ 
+      pathname: '../expanded-pages/FeaturedGuides', 
+      params: { title: item.title, duration: item.duration, level: item.level, image: item.image }
+    })}
+  > 
       <Image source={item.image} style={styles.workoutImage} />
       <View style={styles.workoutDetails}>
         <Text style={styles.workoutTitle}>{item.title}</Text>
@@ -130,7 +131,6 @@ function Workouts() {
                       <Text style={styles.featuredDesc}>{item.description}</Text>
                       <TouchableOpacity style={styles.startButton}
                       
-                      // onPress={() => navigation.navigate('FeaturedGuides')}
 
                       onPress={() => router.push('../expanded-pages/FeaturedGuides')}>
                                             
@@ -176,7 +176,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#F1F0F0',
   },
   scrollContainer: {
-    padding: 1,
+    padding: 4,
   },
   searchInput: {
     backgroundColor: '#FFF',

@@ -203,7 +203,7 @@ const Profile = () => {
 
       {/* Account Options */}
       <View style={styles.optionsContainer}>
-        <TouchableOpacity style={styles.option}>
+        <TouchableOpacity style={styles.option} onPress={() => router.push('../expanded-pages/MyAccount')}>
           <View style={styles.optionLeft}>
             <MaterialIcons name="account-circle" size={24} color="#666" />
             <Text style={styles.optionText}>My Account</Text>
