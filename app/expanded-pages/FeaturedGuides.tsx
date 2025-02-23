@@ -4,8 +4,10 @@ import { useNavigation } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
 import { Header } from '@/components/Header';
 import { useLocalSearchParams } from 'expo-router';
+import { useRouter } from 'expo-router';
 
 const FeaturedGuides = () => {
+  const router = useRouter();
   const navigation = useNavigation();
   const { title, duration, level, image, description, equipment, intensity } = useLocalSearchParams(); 
 
@@ -25,11 +27,12 @@ const FeaturedGuides = () => {
           <Ionicons name="chevron-back" size={24} color="white" />
         </TouchableOpacity>
 
+
+        <View style={styles.overlay}>
         <Image
-          source={image ? { uri: image } : require('@/assets/images/wheelfit_background.png')}
+          source={image ? { uri: image } : require('@/assets/images/wheelchairguy1.jpg')}
           style={styles.heroImage}
         />
-        <View style={styles.overlay}>
           <Text style={styles.workoutTitle}>{title || "Adaptive Strength Workout"}</Text>
           <Text style={styles.workoutDescription}>
             {duration ? `${duration} • ${level}` : "Build core strength, improve mobility, and stay active."}
@@ -61,9 +64,10 @@ const FeaturedGuides = () => {
 
       {/* Start Workout Button */}
       <View style={styles.startButtonContainer}>
-        <TouchableOpacity style={styles.startButton}>
+        <TouchableOpacity style={styles.startButton}
+                  onPress={() => router.push('../expanded-pages/SplashScreenFour')}>
           <Text style={styles.startButtonText}>Start Workout</Text>
-        </TouchableOpacity>
+          </TouchableOpacity>
       </View>
     </View>
   );
@@ -93,7 +97,7 @@ const styles = StyleSheet.create({
     position: 'absolute',
   },
   overlay: {
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    backgroundColor: 'rgba(232, 58, 58, 0.23)',
     width: '100%',
     height: '100%',
     alignItems: 'center',

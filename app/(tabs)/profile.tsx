@@ -211,38 +211,19 @@ const Profile = () => {
           <MaterialIcons name="warning" size={20} color="red" />
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.option}>
+
+        <TouchableOpacity style={styles.option} onPress={() => router.push('../expanded-pages/SettingsPage')}>
+          <View style={styles.optionLeft}>
+            <FontAwesome name="heart" size={24} color="#666" />
+            <Text style={[styles.optionText]}>Settings</Text>
+          </View>
+          <MaterialIcons name="chevron-right" size={24} color="#666" />
+        </TouchableOpacity>
+
+        <TouchableOpacity style={styles.option} onPress={() => router.push('../expanded-pages/YourPreferences')}>
           <View style={styles.optionLeft}>
             <FontAwesome name="sliders" size={24} color="#666" />
             <Text style={styles.optionText}>Your Preferences</Text>
-          </View>
-          <MaterialIcons name="chevron-right" size={24} color="#666" />
-        </TouchableOpacity>
-
-        <TouchableOpacity style={styles.option}>
-          <View style={styles.optionLeft}>
-            <FontAwesome name="heart" size={24} color="#666" />
-            <Text style={[styles.optionText, { color: 'red' }]}>Saved Beneficiary</Text>
-          </View>
-          <MaterialIcons name="chevron-right" size={24} color="#666" />
-        </TouchableOpacity>
-
-        <View style={styles.option}>
-          <View style={styles.optionLeft}>
-            <MaterialIcons name="fingerprint" size={24} color="#666" />
-            <Text style={styles.optionText}>Face ID / Touch ID</Text>
-          </View>
-          <Switch
-            value={faceIdEnabled}
-            onValueChange={toggleFaceId}
-            thumbColor={faceIdEnabled ? '#1E90FF' : '#ddd'}
-          />
-        </View>
-
-        <TouchableOpacity style={styles.option}>
-          <View style={styles.optionLeft}>
-            <MaterialIcons name="security" size={24} color="#666" />
-            <Text style={styles.optionText}>Two-Factor Authentication</Text>
           </View>
           <MaterialIcons name="chevron-right" size={24} color="#666" />
         </TouchableOpacity>
@@ -315,7 +296,7 @@ const styles = StyleSheet.create({
   optionsContainer: {
     marginTop: 16,
     backgroundColor: '#fff',
-    borderRadius: 8,
+    borderRadius: 20,
     marginHorizontal: 16,
     paddingVertical: 8,
   },

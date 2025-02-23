@@ -53,8 +53,8 @@ const workoutsData = [
   { title: 'Chest - Easy', duration: '15 mins', level: 'Beginner', image: require('@/assets/images/chest.png') },
   { title: 'Shoulder & Back - Intermediate', duration: '15 mins', level: 'Intermediate', image: require('@/assets/images/shoulder_back.png') },
   { title: 'Arms - Intermediate', duration: '15 mins', level: 'Intermediate', image: require('@/assets/images/arms.png') },
-  { title: 'Follow Along - Advanced', duration: '15 mins', level: 'Advanced', image: require('@/assets/images/follow_along.jpg') },
-  { title: 'Full Body Stretch - Easy', duration: '15 mins', level: 'Beginner', image: require('@/assets/images/chest.png') },
+  { title: 'Follow Along - Advanced', duration: '15 mins', level: 'Advanced', image: require('@/assets/images/wheelchairman2.png') },
+  { title: 'Full Body Stretch - Easy', duration: '15 mins', level: 'Beginner', image: require('@/assets/images/wheelchairguy1.jpg') },
   { title: 'Follow Along - Advanced', duration: '15 mins', level: 'Advanced', image: require('@/assets/images/follow_along.jpg') },
 ];
 
@@ -108,17 +108,17 @@ function Workouts() {
                     {
                       title: 'MASSIVE UPPER BODY',
                       description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
-                      image: require('@/assets/images/chest1.png'),
+                      image: require('@/assets/images/wheelchairman.png'),
                     },
                     {
                       title: 'LEGS & CORE BLAST',
                       description: 'Push your limits with this intense workout for legs and core.',
-                      image: require('@/assets/images/chest1.png'),
+                      image: require('@/assets/images/wheelchairman1.png'),
                     },
                     {
                       title: 'MASSIVE UPPER BODY',
                       description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
-                      image: require('@/assets/images/chest1.png'),
+                      image: require('@/assets/images/wheelchairman.png'),
                     },
                   ]}
                   horizontal

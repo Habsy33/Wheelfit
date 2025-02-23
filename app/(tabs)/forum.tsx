@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   View,
   Text,
@@ -11,17 +11,20 @@ import {
 import { MaterialIcons, FontAwesome } from '@expo/vector-icons';
 import { Header } from '@/components/Header'; // Importing the Header component
 import { useRouter } from 'expo-router';
+import { createPost, fetchForumPosts } from '@/utils/forumFunctions';
 
 // Define types for the items in the FlatList
 interface Post {
   id: string;
   type: 'post';
   title: string;
+  content: string; // Add this
   tags: string[];
-  views: string;
-  likes: string;
-  comments: string;
   author: string;
+  likes: number; // Change from string to number
+  comments: number; // Change from string to number
+  timestamp: number; // Add this
+  userId?: string; // Add this (optional)
 }
 
 interface Meetup {
@@ -57,29 +60,43 @@ type ForumItem = Post | Meetup | SearchItem | FilterItem | CreatePostItem | Head
 
 const Forum: React.FC = () => {
   const router = useRouter();
+  const [forumPosts, setForumPosts] = useState<Post[]>([]);
+  const [newPostTitle, setNewPostTitle] = useState("");
+  const [newPostContent, setNewPostContent] = useState("");
 
-  const posts: Post[] = [
-    {
-      id: '1',
-      type: 'post',
-      title: "Conquering Home Workouts: What's in Your Routine?",
-      tags: ['wheelchair', 'fitness', 'daily exercise'],
-      views: '651,324 Views',
-      likes: '36,645 Likes',
-      comments: '56 Comments',
-      author: 'John Doe',
-    },
-    {
-      id: '2',
-      type: 'post',
-      title: 'Tackling Upper-Body Strength: My Progress with Resistance Bands!',
-      tags: ['resistance bands', 'upper body', 'progress update'],
-      views: '244,568 Views',
-      likes: '10,920 Likes',
-      comments: '134 Comments',
-      author: 'Jane Smith',
-    },
-  ];
+  // Fetch posts from the database on component mount
+  useEffect(() => {
+    fetchForumPosts(setForumPosts);
+  }, []);
+
+  // Handle creating a new post
+  const handleCreatePost = async () => {
+    if (newPostTitle && newPostContent) {
+      // Create the post in the database
+      await createPost(newPostTitle, newPostContent, ["wheelchair", "fitness"]);
+      
+      // Clear the input fields
+      setNewPostTitle("");
+      setNewPostContent("");
+
+      // Refetch posts to update the list in real-time
+      fetchForumPosts(setForumPosts);
+    }
+  };
+
+  // Static posts and meetups data
+  // const posts: Post[] = [
+  //   {
+  //     id: '1',
+  //     type: 'post',
+  //     title: "Conquering Home Workouts: What's in Your Routine?",
+  //     tags: ['wheelchair', 'fitness', 'daily exercise'],
+  //     views: '651,324 Views',
+  //     likes: '36,645 Likes',
+  //     comments: '56 Comments',
+  //     author: 'John Doe',
+  //   },
+  // ];
 
   const meetups: Meetup[] = [
     {
@@ -90,41 +107,20 @@ const Forum: React.FC = () => {
       location: 'Technogym, Glasgow Club, Scotland',
       format: 'Remote / Workshop',
     },
-    {
-      id: '4',
-      type: 'meetup',
-      date: 'JUL 13',
-      title: 'SDS Summer Camp 2025',
-      location: 'Scottish Disability Sport, Scotland, United Kingdom',
-      format: 'In Person',
-    },
-    {
-      id: '5',
-      type: 'meetup',
-      date: 'JUL 13',
-      title: 'SDS Summer Camp 2025',
-      location: 'Scottish Disability Sport, Scotland, United Kingdom',
-      format: 'In Person',
-    },
-    {
-      id: '6',
-      type: 'meetup',
-      date: 'JUL 13',
-      title: 'SDS Summer Camp 2025',
-      location: 'Scottish Disability Sport, Scotland, United Kingdom',
-      format: 'In Person',
-    },
   ];
 
+  // Combine all data for the FlatList
   const combinedData: ForumItem[] = [
     { id: 'search', type: 'search' },
     { id: 'filters', type: 'filters' },
     { id: 'createPost', type: 'createPost' },
-    ...posts,
+    ...forumPosts, // Add dynamically fetched posts
+    // ...posts, // Add static posts
     { id: 'meetupsHeader', type: 'header' },
-    ...meetups,
+    ...meetups, // Add meetups
   ];
 
+  // Render each item in the FlatList
   const renderItem: ListRenderItem<ForumItem> = ({ item }) => {
     switch (item.type) {
       case 'search':
@@ -160,10 +156,18 @@ const Forum: React.FC = () => {
           <View style={styles.createPost}>
             <TextInput
               style={styles.createPostInput}
-              placeholder="Let's share what's going on..."
-              placeholderTextColor="#999"
+              placeholder="Title"
+              value={newPostTitle}
+              onChangeText={setNewPostTitle}
             />
-            <TouchableOpacity style={styles.createPostButton}>
+            <TextInput
+              style={styles.createPostInput}
+              placeholder="What's on your mind?"
+              value={newPostContent}
+              onChangeText={setNewPostContent}
+              multiline
+            />
+            <TouchableOpacity style={styles.createPostButton} onPress={handleCreatePost}>
               <Text style={styles.createPostButtonText}>Create Post</Text>
             </TouchableOpacity>
           </View>
@@ -171,19 +175,20 @@ const Forum: React.FC = () => {
       case 'post':
         return (
           <TouchableOpacity style={styles.postContainer} onPress={() => router.push(`../expanded-pages/discussionPage?id=${item.id}`)}>
-          <View style={styles.postContainer}>
-            <Text style={styles.postTitle}>{item.title}</Text>
-            <View style={styles.tagsContainer}>
-              {item.tags.map((tag, index) => (
-                <View key={index} style={styles.tag}>
-                  <Text style={styles.tagText}>{tag}</Text>
-                </View>
-              ))}
+            <View style={styles.postContainer}>
+              <Text style={styles.postTitle}>{item.title}</Text>
+              <View style={styles.tagsContainer}>
+                {item.tags.map((tag, index) => (
+                  <View key={index} style={styles.tag}>
+                    <Text style={styles.tagText}>{tag}</Text>
+                  </View>
+                ))}
+              </View>
+              <Text style={styles.postMeta}>
+                {/* {item.views}  */}
+                {item.author}• {item.likes} • {item.comments}
+              </Text>
             </View>
-            <Text style={styles.postMeta}>
-              {item.views} • {item.likes} • {item.comments}
-            </Text>
-          </View>
           </TouchableOpacity>
         );
       case 'header':

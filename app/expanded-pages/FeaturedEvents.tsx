@@ -4,8 +4,11 @@ import { useNavigation } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
 import { Header } from '@/components/Header';
 import { useLocalSearchParams } from 'expo-router';
+import { useRouter } from 'expo-router';
+
 
 const FeaturedEvents = () => {
+  const router = useRouter();
   const navigation = useNavigation();
   const { title, duration, level, image, description, equipment, intensity } = useLocalSearchParams(); 
 
@@ -61,7 +64,8 @@ const FeaturedEvents = () => {
 
       {/* Start Workout Button */}
       <View style={styles.startButtonContainer}>
-        <TouchableOpacity style={styles.startButton}>
+        <TouchableOpacity style={styles.startButton}
+        onPress={() => router.push('../expanded-pages/SplashScreenThree')}>
           <Text style={styles.startButtonText}>I'm Going!</Text>
         </TouchableOpacity>
       </View>
