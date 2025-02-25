@@ -1,168 +1,134 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   View,
   Text,
   StyleSheet,
-  TextInput,
-  Switch,
-  TouchableOpacity,
-  SafeAreaView,
+  ActivityIndicator,
+  ScrollView,
 } from 'react-native';
-import { Formik } from 'formik';
-import * as Yup from 'yup';
-import { Header } from '@/components/Header'; // Import the Header component
+import { Header } from '@/components/Header';
+import { getPreferences } from '@/utils/preferences'; 
+import { auth } from '@/firebaseConfig'; 
 
-// Define the Preferences interface
-interface Preferences {
-  fitnessGoal: string;
-  workoutType: string[];
-  intensityLevel: string;
-  sessionDuration: string;
-  communityTab: boolean;
-  healthAlerts: string;
-  workoutReminders: boolean;
-  pushNotifications: boolean;
-}
+const YourPreferences = () => {
+  const [loading, setLoading] = useState(true);
+  const [preferences, setPreferences] = useState<{
+    goal: string | null;
+    gender: string | null;
+    limitation: string | null;
+    age: number | null;
+    weight: number | null;
+    height: number | null;
+    preference: string | null;
+  } | null>(null);
 
-// Validation schema using Yup
-const PreferencesSchema = Yup.object().shape({
-  fitnessGoal: Yup.string().required('Fitness goal is required'),
-  workoutType: Yup.array().min(1, 'Select at least one workout type'),
-  intensityLevel: Yup.string().required('Intensity level is required'),
-  sessionDuration: Yup.string().required('Session duration is required'),
-  healthAlerts: Yup.string().optional(),
-});
+  // Fetch the user's preferences from Firebase
+  useEffect(() => {
+    const fetchPreferences = async () => {
+      try {
+        const user = auth.currentUser;
+        if (!user) {
+          console.warn('No authenticated user found');
+          return;
+        }
 
-export default function YourPreferences() {
-  const [loading, setLoading] = useState(false);
+        const userPreferences = await getPreferences();
+        setPreferences(userPreferences);
+      } catch (error) {
+        console.error('Error fetching preferences:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
 
-  const onSubmit = (data: Preferences) => {
-    setLoading(true);
-    console.log("Saved Preferences:", data);
-    setTimeout(() => setLoading(false), 1000);
-  };
+    fetchPreferences();
+  }, []);
+
+  if (loading) {
+    return (
+      <View style={styles.loadingContainer}>
+        <ActivityIndicator size="large" color="#000" />
+      </View>
+    );
+  }
 
   return (
-    <SafeAreaView style={styles.safeAreaContainer}>
-      <View style={styles.container}>
-        <Header title="WheelFit" streak="28/30" subtitle="Adaptive Home Workouts" />
+    <ScrollView style={styles.container}>
+      <Header title="WheelFit" streak="28/30" subtitle="Adaptive Home Workouts" />
 
-        <Text style={styles.title}>Your Preferences</Text>
-        <Formik
-          initialValues={{
-            fitnessGoal: '',
-            workoutType: [],
-            intensityLevel: '',
-            sessionDuration: '',
-            communityTab: false,
-            healthAlerts: '',
-            workoutReminders: false,
-            pushNotifications: false,
-          }}
-          validationSchema={PreferencesSchema}
-          onSubmit={onSubmit}
-        >
-          {({ handleChange, handleBlur, handleSubmit, values, setFieldValue, errors, touched }) => (
-            <View>
-              {/* Fitness Preferences */}
-              <View style={styles.section}>
-                <Text style={styles.sectionTitle}>Fitness & Activity Preferences</Text>
-                <TextInput
-                  style={styles.input}
-                  placeholder="Fitness Goal"
-                  onChangeText={handleChange('fitnessGoal')}
-                  onBlur={handleBlur('fitnessGoal')}
-                  value={values.fitnessGoal}
-                />
-                {touched.fitnessGoal && errors.fitnessGoal && (
-                  <Text style={styles.errorText}>{errors.fitnessGoal}</Text>
-                )}
-              </View>
+      <Text style={styles.title}>Your Preferences</Text>
 
-              {/* Community Preferences */}
-              <View style={styles.section}>
-                <Text style={styles.sectionTitle}>Community & Social Preferences</Text>
-                <View style={styles.switchContainer}>
-                  <Text>Enable Community Tab</Text>
-                  <Switch
-                    value={values.communityTab}
-                    onValueChange={(value: boolean) => {
-                      setFieldValue('communityTab', value).then(() => {
-                        // Optional: Add any additional logic here if needed
-                      });
-                    }}
-                  />
-                </View>
-              </View>
-
-              {/* Health & Safety Preferences */}
-              <View style={styles.section}>
-                <Text style={styles.sectionTitle}>Health & Safety Preferences</Text>
-                <TextInput
-                  style={styles.input}
-                  placeholder="Health Alerts (e.g., Pressure sores)"
-                  onChangeText={handleChange('healthAlerts')}
-                  onBlur={handleBlur('healthAlerts')}
-                  value={values.healthAlerts}
-                />
-                <View style={styles.switchContainer}>
-                  <Text>Workout Reminders</Text>
-                  <Switch
-                    value={values.workoutReminders}
-                    onValueChange={(value: boolean) => {
-                      setFieldValue('workoutReminders', value).then(() => {
-                        // Optional: Add any additional logic here if needed
-                      });
-                    }}
-                  />
-                </View>
-              </View>
-
-              {/* Notifications Preferences */}
-              <View style={styles.section}>
-                <Text style={styles.sectionTitle}>Notifications & App Settings</Text>
-                <View style={styles.switchContainer}>
-                  <Text>Push Notifications</Text>
-                  <Switch
-                    value={values.pushNotifications}
-                    onValueChange={(value: boolean) => {
-                      setFieldValue('pushNotifications', value).then(() => {
-                        // Optional: Add any additional logic here if needed
-                      });
-                    }}
-                  />
-                </View>
-              </View>
-
-              {/* Submit Button */}
-              <TouchableOpacity
-                style={styles.button}
-                onPress={() => handleSubmit()} // Wrap handleSubmit to ignore the event argument
-              >
-                <Text style={styles.buttonText}>{loading ? "Saving..." : "Save Preferences"}</Text>
-              </TouchableOpacity>
-            </View>
-          )}
-        </Formik>
+      {/* Display Preferences */}
+      <View style={styles.section}>
+        <Text style={styles.sectionTitle}>Fitness Goal</Text>
+        <Text style={styles.preferenceText}>
+          {preferences?.goal || 'Not set'}
+        </Text>
       </View>
-    </SafeAreaView>
+
+      <View style={styles.section}>
+        <Text style={styles.sectionTitle}>Gender</Text>
+        <Text style={styles.preferenceText}>
+          {preferences?.gender || 'Not set'}
+        </Text>
+      </View>
+
+      <View style={styles.section}>
+        <Text style={styles.sectionTitle}>Limitation</Text>
+        <Text style={styles.preferenceText}>
+          {preferences?.limitation || 'Not set'}
+        </Text>
+      </View>
+
+      <View style={styles.section}>
+        <Text style={styles.sectionTitle}>Age</Text>
+        <Text style={styles.preferenceText}>
+          {preferences?.age || 'Not set'}
+        </Text>
+      </View>
+
+      <View style={styles.section}>
+        <Text style={styles.sectionTitle}>Weight</Text>
+        <Text style={styles.preferenceText}>
+          {preferences?.weight ? `${preferences.weight}` : 'Not set'}
+        </Text>
+      </View>
+
+      <View style={styles.section}>
+        <Text style={styles.sectionTitle}>Height</Text>
+        <Text style={styles.preferenceText}>
+          {preferences?.height ? `${preferences.height}` : 'Not set'}
+        </Text>
+      </View>
+
+      <View style={styles.section}>
+        <Text style={styles.sectionTitle}>Preference</Text>
+        <Text style={styles.preferenceText}>
+          {preferences?.preference || 'Not set'}
+        </Text>
+      </View>
+    </ScrollView>
   );
-}
+};
 
 const styles = StyleSheet.create({
-  safeAreaContainer: {
+  loadingContainer: {
     flex: 1,
-    backgroundColor: '#F1F0F0', // Match the background color from index.tsx
-    marginTop: -60,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   container: {
     flex: 1,
     backgroundColor: '#fff',
+    padding: 1,
+    marginTop: -40,
   },
   title: {
+    marginTop: 40,
     fontSize: 24,
     fontWeight: 'bold',
-    marginBottom: 16,
+    marginBottom: 25,
+    textAlign: 'center',
   },
   section: {
     marginBottom: 16,
@@ -170,38 +136,18 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#ccc',
     borderRadius: 8,
+    marginLeft: 10,
+    marginRight: 10,
   },
   sectionTitle: {
     fontSize: 18,
     fontWeight: 'bold',
     marginBottom: 8,
   },
-  input: {
-    borderWidth: 1,
-    borderColor: '#ccc',
-    padding: 8,
-    borderRadius: 4,
-    marginBottom: 8,
-  },
-  switchContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    marginBottom: 8,
-  },
-  button: {
-    backgroundColor: '#007BFF',
-    padding: 12,
-    borderRadius: 8,
-    alignItems: 'center',
-  },
-  buttonText: {
-    color: 'white',
-    fontWeight: 'bold',
-  },
-  errorText: {
-    color: 'red',
-    fontSize: 12,
-    marginBottom: 8,
+  preferenceText: {
+    fontSize: 16,
+    color: '#333',
   },
 });
+
+export default YourPreferences;

@@ -1,12 +1,10 @@
 import React, { useState } from "react";
 import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
-import { Redirect } from 'expo-router';
-import { useRouter } from 'expo-router';
-
+import { useRouter } from "expo-router";
+import { updatePreferences } from "@/utils/preferences"; // Import the updatePreferences function
 
 const AssessmentOne: React.FC = () => {
-
-    const router = useRouter();
+  const router = useRouter();
   const [selectedGoal, setSelectedGoal] = useState<string | null>(null);
 
   const goals = [
@@ -16,6 +14,13 @@ const AssessmentOne: React.FC = () => {
     "I wanna gain endurance",
     "Just trying out the app!",
   ];
+
+  const handleContinue = async () => {
+    if (selectedGoal) {
+      await updatePreferences( "goal", selectedGoal);
+    }
+    router.push("../AssessmentTwo");
+  };
 
   return (
     <View style={styles.container}>
@@ -43,7 +48,7 @@ const AssessmentOne: React.FC = () => {
           </TouchableOpacity>
         ))}
       </View>
-      <TouchableOpacity style={styles.continueButton}  onPress={() => router.push('../AssessmentTwo')}>
+      <TouchableOpacity style={styles.continueButton} onPress={handleContinue}>
         <Text style={styles.continueButtonText}>Continue</Text>
       </TouchableOpacity>
     </View>
@@ -65,10 +70,9 @@ const styles = StyleSheet.create({
     color: "#333",
   },
   progress: {
-    fontSize: 20,
-    fontWeight: "bold",
+    fontSize: 16,
     marginBottom: 20,
-    color: "#333",
+    color: "#666",
   },
   question: {
     fontSize: 18,

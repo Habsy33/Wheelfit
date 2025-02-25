@@ -1,14 +1,11 @@
 import React, { useState } from "react";
-import { View, Text, TouchableOpacity, StyleSheet, TextInput } from "react-native";
-import { Redirect } from 'expo-router';
-import { useRouter } from 'expo-router';
+import { View, Text, TouchableOpacity, StyleSheet, ScrollView } from "react-native";
+import { useRouter } from "expo-router";
+import { updatePreferences } from "@/utils/preferences"; // Import the updatePreferences function
 
-const AssessmentFive: React.FC = () => {
-
+const AssessmentSix: React.FC = () => {
   const router = useRouter();
   const [selectedPreferences, setSelectedPreferences] = useState<string[]>([]);
-  const [heightUnit, setHeightUnit] = useState<"cm" | "ft">("cm");
-  const [height, setHeight] = useState<string>("");
 
   const preferences = [
     "Jogging", "Walking", "Hiking", "Skating", "Biking", 
@@ -23,43 +20,53 @@ const AssessmentFive: React.FC = () => {
     }
   };
 
+  const handleFinish = async () => {
+    if (selectedPreferences.length > 0) {
+      await updatePreferences("preference", selectedPreferences.join(", "));
+    }
+    router.push("/(tabs)"); // Redirect to the index page after setup
+  };
+
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Assessment</Text>
-      <Text style={styles.subtitle}>6 of 6</Text>
-      <Text style={styles.question}>Do you have a specific Exercise Preference?</Text>
-      <View style={styles.preferencesContainer}>
-        {preferences.map((preference, index) => (
-          <TouchableOpacity
-            key={index}
-            style={[
-              styles.preferenceButton,
-              selectedPreferences.includes(preference) && styles.selectedPreferenceButton,
-            ]}
-            onPress={() => togglePreference(preference)}
-          >
-            <Text
+    <ScrollView contentContainerStyle={styles.scrollContainer}>
+      <View style={styles.container}>
+        <Text style={styles.title}>Assessment</Text>
+        <Text style={styles.subtitle}>6 of 6</Text>
+        <Text style={styles.question}>Do you have a specific Exercise Preference?</Text>
+        <View style={styles.preferencesContainer}>
+          {preferences.map((preference, index) => (
+            <TouchableOpacity
+              key={index}
               style={[
-                styles.preferenceText,
-                selectedPreferences.includes(preference) && styles.selectedPreferenceText,
+                styles.preferenceButton,
+                selectedPreferences.includes(preference) && styles.selectedPreferenceButton,
               ]}
+              onPress={() => togglePreference(preference)}
             >
-              {preference}
-            </Text>
-          </TouchableOpacity>
-        ))}
+              <Text
+                style={[
+                  styles.preferenceText,
+                  selectedPreferences.includes(preference) && styles.selectedPreferenceText,
+                ]}
+              >
+                {preference}
+              </Text>
+            </TouchableOpacity>
+          ))}
+        </View>
+        <TouchableOpacity style={styles.continueButton} onPress={handleFinish}>
+          <Text style={styles.continueButtonText}>Finish Preferences Setup! →</Text>
+        </TouchableOpacity>
       </View>
-      <TouchableOpacity style={styles.continueButton} onPress={() => router.push('/(auth)/SignIn')}
-      // change the destination of the button to the index, since this will take
-      // place after the user has created an account already
-            >
-        <Text style={styles.continueButtonText}>Finish Preferences Setup! →</Text>
-      </TouchableOpacity>
-    </View>
+    </ScrollView>
   );
 };
 
 const styles = StyleSheet.create({
+  scrollContainer: {
+    flexGrow: 1,
+    justifyContent: "center",
+  },
   container: {
     flex: 1,
     justifyContent: "center",
@@ -111,42 +118,6 @@ const styles = StyleSheet.create({
     color: "#007bff",
     fontWeight: "bold",
   },
-  unitContainer: {
-    flexDirection: "row",
-    justifyContent: "center",
-    marginBottom: 20,
-  },
-  unitButton: {
-    padding: 10,
-    marginHorizontal: 10,
-    borderWidth: 1,
-    borderColor: "#ccc",
-    borderRadius: 10,
-    alignItems: "center",
-  },
-  selectedUnitButton: {
-    borderColor: "#007bff",
-    backgroundColor: "#e6f2ff",
-  },
-  unitText: {
-    fontSize: 16,
-    color: "#333",
-  },
-  selectedUnitText: {
-    color: "#007bff",
-    fontWeight: "bold",
-  },
-  input: {
-    width: "80%",
-    padding: 12,
-    marginBottom: 20,
-    borderWidth: 1,
-    borderColor: "#ccc",
-    borderRadius: 10,
-    backgroundColor: "white",
-    fontSize: 16,
-    textAlign: "center",
-  },
   continueButton: {
     backgroundColor: "#007bff",
     paddingVertical: 12,
@@ -160,4 +131,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default AssessmentFive;
+export default AssessmentSix;

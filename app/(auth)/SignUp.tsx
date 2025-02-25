@@ -65,7 +65,7 @@ const SignUp: React.FC = () => {
       await set(usernameRefToSet, { userId });
   
       // Redirect user to another authentication page (e.g., email verification)
-      router.push("/(auth)/(preferences)/AssessmentOne");
+      router.push("/(auth)/(preferences)/AssessmentSplashScreen");
   
     } catch (error: any) {
       console.error("Error signing up:", error);

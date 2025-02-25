@@ -1,14 +1,20 @@
 import React, { useState } from "react";
 import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
-import { Redirect } from 'expo-router';
-import { useRouter } from 'expo-router';
-
+import { useRouter } from "expo-router";
+import { updatePreferences } from "@/utils/preferences"; // Import the updatePreferences function
 
 const AssessmentTwo: React.FC = () => {
   const router = useRouter();
   const [selectedGender, setSelectedGender] = useState<string | null>(null);
 
   const genders = ["Male", "Female", "Prefer to skip, thanks!"];
+
+  const handleContinue = async () => {
+    if (selectedGender) {
+      await updatePreferences("gender", selectedGender);
+    }
+    router.push("../AssessmentThree");
+  };
 
   return (
     <View style={styles.container}>
@@ -36,7 +42,7 @@ const AssessmentTwo: React.FC = () => {
           </TouchableOpacity>
         ))}
       </View>
-      <TouchableOpacity style={styles.continueButton} onPress={() => router.push('../AssessmentThree')}>
+      <TouchableOpacity style={styles.continueButton} onPress={handleContinue}>
         <Text style={styles.continueButtonText}>Continue</Text>
       </TouchableOpacity>
     </View>
@@ -58,10 +64,9 @@ const styles = StyleSheet.create({
     color: "#333",
   },
   progress: {
-    fontSize: 20,
-    fontWeight: "bold",
+    fontSize: 16,
     marginBottom: 20,
-    color: "#333",
+    color: "#666",
   },
   question: {
     fontSize: 18,

@@ -1,12 +1,10 @@
 import React, { useState } from "react";
-import{ View, Text, TouchableOpacity, StyleSheet } from "react-native";
-import { Redirect } from 'expo-router';
-import { useRouter } from 'expo-router';
-
+import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
+import { useRouter } from "expo-router";
+import { updatePreferences } from "@/utils/preferences"; // Import the updatePreferences function
 
 const AssessmentThree: React.FC = () => {
-
-  const router  = useRouter();  
+  const router = useRouter();
   const [selectedLimitations, setSelectedLimitations] = useState<string[]>([]);
 
   const limitations = ["Arthritis", "Back Pain", "Asthma", "Obesity", "Knee Pain"];
@@ -17,6 +15,13 @@ const AssessmentThree: React.FC = () => {
     } else {
       setSelectedLimitations([...selectedLimitations, limitation]);
     }
+  };
+
+  const handleContinue = async () => {
+    if (selectedLimitations.length > 0) {
+      await updatePreferences("limitation", selectedLimitations.join(", "));
+    }
+    router.push("../AssessmentFour");
   };
 
   return (
@@ -50,7 +55,7 @@ const AssessmentThree: React.FC = () => {
         <Text style={styles.commonLimitation}>Knee Pain X</Text>
         <Text style={styles.commonLimitation}>Muscle Pain X</Text>
       </View>
-      <TouchableOpacity style={styles.continueButton} onPress={() => router.push('../AssessmentFour')}>
+      <TouchableOpacity style={styles.continueButton} onPress={handleContinue}>
         <Text style={styles.continueButtonText}>Continue</Text>
       </TouchableOpacity>
     </View>
@@ -68,14 +73,13 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 24,
     fontWeight: "bold",
-    marginBottom: 10,
+    marginBottom: 20,
     color: "#333",
   },
   progress: {
-    fontSize: 20,
+    fontSize: 16,
     marginBottom: 20,
-    color: "#333",
-    fontWeight: 'bold',
+    color: "#666",
   },
   question: {
     fontSize: 18,
@@ -85,7 +89,7 @@ const styles = StyleSheet.create({
   },
   limitationsContainer: {
     width: "100%",
-    marginBottom: 30,
+    marginBottom: 20,
   },
   limitationButton: {
     padding: 15,

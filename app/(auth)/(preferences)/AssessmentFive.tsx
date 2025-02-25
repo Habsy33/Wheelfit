@@ -1,113 +1,130 @@
 import React, { useState } from "react";
-import { View, Text, TouchableOpacity, StyleSheet, TextInput } from "react-native";
-import { Redirect } from 'expo-router';
-import { useRouter } from 'expo-router';
-
+import { View, Text, TouchableOpacity, StyleSheet, TextInput, ScrollView } from "react-native";
+import { useRouter } from "expo-router";
+import { updatePreferences } from "@/utils/preferences"; // Import the updatePreferences function
 
 const AssessmentFive: React.FC = () => {
-
-  const router = useRouter();  
+  const router = useRouter();
   const [weightUnit, setWeightUnit] = useState<"kg" | "lbs">("kg");
   const [weight, setWeight] = useState<string>("");
   const [heightUnit, setHeightUnit] = useState<"cm" | "ft">("cm");
   const [height, setHeight] = useState<string>("");
 
+  const handleContinue = async () => {
+    if (weight && height) {
+      // Save weight with unit
+      const weightWithUnit = `${weight} ${weightUnit}`;
+      await updatePreferences("weight", weightWithUnit);
+
+      // Save height with unit
+      const heightWithUnit = `${height} ${heightUnit}`;
+      await updatePreferences("height", heightWithUnit);
+    }
+    router.push("../AssessmentSix");
+  };
+
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Assessment</Text>
-      <Text style={styles.subtitle}>5 of 6</Text>
-      <Text style={styles.question}>What is your weight?</Text>
-      <View style={styles.unitContainer}>
-        <TouchableOpacity
-          style={[
-            styles.unitButton,
-            weightUnit === "kg" && styles.selectedUnitButton,
-          ]}
-          onPress={() => setWeightUnit("kg")}
-        >
-          <Text
+    <ScrollView contentContainerStyle={styles.scrollContainer}>
+      <View style={styles.container}>
+        <Text style={styles.title}>Assessment</Text>
+        <Text style={styles.subtitle}>5 of 6</Text>
+        <Text style={styles.question}>What is your weight?</Text>
+        <View style={styles.unitContainer}>
+          <TouchableOpacity
             style={[
-              styles.unitText,
-              weightUnit === "kg" && styles.selectedUnitText,
+              styles.unitButton,
+              weightUnit === "kg" && styles.selectedUnitButton,
             ]}
+            onPress={() => setWeightUnit("kg")}
           >
-            kg
-          </Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={[
-            styles.unitButton,
-            weightUnit === "lbs" && styles.selectedUnitButton,
-          ]}
-          onPress={() => setWeightUnit("lbs")}
-        >
-          <Text
+            <Text
+              style={[
+                styles.unitText,
+                weightUnit === "kg" && styles.selectedUnitText,
+              ]}
+            >
+              kg
+            </Text>
+          </TouchableOpacity>
+          <TouchableOpacity
             style={[
-              styles.unitText,
-              weightUnit === "lbs" && styles.selectedUnitText,
+              styles.unitButton,
+              weightUnit === "lbs" && styles.selectedUnitButton,
             ]}
+            onPress={() => setWeightUnit("lbs")}
           >
-            lbs
-          </Text>
+            <Text
+              style={[
+                styles.unitText,
+                weightUnit === "lbs" && styles.selectedUnitText,
+              ]}
+            >
+              lbs
+            </Text>
+          </TouchableOpacity>
+        </View>
+        <TextInput
+          style={styles.input}
+          placeholder="128"
+          value={weight}
+          onChangeText={setWeight}
+          keyboardType="numeric"
+        />
+        <Text style={styles.question}>What is your height?</Text>
+        <View style={styles.unitContainer}>
+          <TouchableOpacity
+            style={[
+              styles.unitButton,
+              heightUnit === "cm" && styles.selectedUnitButton,
+            ]}
+            onPress={() => setHeightUnit("cm")}
+          >
+            <Text
+              style={[
+                styles.unitText,
+                heightUnit === "cm" && styles.selectedUnitText,
+              ]}
+            >
+              cm
+            </Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={[
+              styles.unitButton,
+              heightUnit === "ft" && styles.selectedUnitButton,
+            ]}
+            onPress={() => setHeightUnit("ft")}
+          >
+            <Text
+              style={[
+                styles.unitText,
+                heightUnit === "ft" && styles.selectedUnitText,
+              ]}
+            >
+              ft
+            </Text>
+          </TouchableOpacity>
+        </View>
+        <TextInput
+          style={styles.input}
+          placeholder="170"
+          value={height}
+          onChangeText={setHeight}
+          keyboardType="numeric"
+        />
+        <TouchableOpacity style={styles.continueButton} onPress={handleContinue}>
+          <Text style={styles.continueButtonText}>Continue</Text>
         </TouchableOpacity>
       </View>
-      <TextInput
-        style={styles.input}
-        placeholder="128"
-        value={weight}
-        onChangeText={setWeight}
-        keyboardType="numeric"
-      />
-      <Text style={styles.question}>What is your height?</Text>
-      <View style={styles.unitContainer}>
-        <TouchableOpacity
-          style={[
-            styles.unitButton,
-            heightUnit === "cm" && styles.selectedUnitButton,
-          ]}
-          onPress={() => setHeightUnit("cm")}
-        >
-          <Text
-            style={[
-              styles.unitText,
-              heightUnit === "cm" && styles.selectedUnitText,
-            ]}
-          >
-            cm
-          </Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={[
-            styles.unitButton,
-            heightUnit === "ft" && styles.selectedUnitButton,
-          ]}
-          onPress={() => setHeightUnit("ft")}
-        >
-          <Text
-            style={[
-              styles.unitText,
-              heightUnit === "ft" && styles.selectedUnitText,
-            ]}
-          >
-            ft
-          </Text>
-        </TouchableOpacity>
-      </View>
-      <TextInput
-        style={styles.input}
-        placeholder="170"
-        value={height}
-        onChangeText={setHeight}
-        keyboardType="numeric"
-      />
-      <TouchableOpacity style={styles.continueButton} onPress={() => router.push('../AssessmentSix')}>
-        <Text style={styles.continueButtonText}>Continue</Text>
-      </TouchableOpacity>
-    </View>
+    </ScrollView>
   );
 };
 
 const styles = StyleSheet.create({
+  scrollContainer: {
+    flexGrow: 1,
+    justifyContent: "center",
+  },
   container: {
     flex: 1,
     justifyContent: "center",
