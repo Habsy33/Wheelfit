@@ -12,6 +12,7 @@ import GuideScreen2 from './GuideScreen2';
 import GuideScreen3 from './GuideScreen3';
 import FeaturedGuides from '../expanded-pages/FeaturedGuides';
 
+
 const Stack = createStackNavigator();
 
 const AppNavigator = () => {

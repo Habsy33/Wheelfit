@@ -7,17 +7,16 @@ import {
   StyleSheet,
 } from 'react-native';
 import { Ionicons, FontAwesome } from '@expo/vector-icons';
-import { useNavigation } from '@react-navigation/native';
-import { AuthNavigationProp } from './AppNavigation';
+import { useRouter } from 'expo-router';
 import { createUserWithEmailAndPassword } from "firebase/auth";
 import { auth, db, ref, set, get } from "@/firebaseConfig";
-
-
-
+import { useNavigation } from '@react-navigation/native';
+import { AuthNavigationProp } from './AppNavigation';
 
 const SignUp: React.FC = () => {
   const navigation = useNavigation<AuthNavigationProp>(); 
-
+  const router = useRouter();
+  
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
@@ -65,11 +64,8 @@ const SignUp: React.FC = () => {
       const usernameRefToSet = ref(db, `usernames/${username}`);
       await set(usernameRefToSet, { userId });
   
-      // Navigate to the main app
-      navigation.reset({
-        index: 0,
-        routes: [{ name: "(tabs)" as never }],
-      });
+      // Redirect user to another authentication page (e.g., email verification)
+      router.push("/(auth)/(preferences)/AssessmentOne");
   
     } catch (error: any) {
       console.error("Error signing up:", error);
@@ -86,7 +82,6 @@ const SignUp: React.FC = () => {
     }
   };
   
-
   return (
     <View style={styles.container}>
       <TouchableOpacity style={styles.backButton} onPress={() => navigation.replace('SignIn')}>

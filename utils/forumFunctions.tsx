@@ -31,7 +31,7 @@ export const createPost = async (title: string, content: string, tags: string[])
     author: '@' + username, // Use the fetched username
     userId: user.uid,
     timestamp: Date.now(),
-    likes: 0,
+    likes: 'likes',
     comments: 0,
   };
 

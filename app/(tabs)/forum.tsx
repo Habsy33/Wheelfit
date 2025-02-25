@@ -18,6 +18,7 @@ interface Post {
   id: string;
   type: 'post';
   title: string;
+  views: number;
   content: string; // Add this
   tags: string[];
   author: string;

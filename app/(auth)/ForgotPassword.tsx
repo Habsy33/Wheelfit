@@ -2,9 +2,13 @@ import React from 'react';
 import {View, Text, TouchableOpacity, StyleSheet, } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
+import { Redirect } from 'expo-router';
+import { useRouter } from 'expo-router';
 
 const ForgotPassword: React.FC = () => {
+
   const navigation = useNavigation();
+  const router = useRouter();
 
   return (
     <View style={styles.container}>
@@ -43,7 +47,7 @@ const ForgotPassword: React.FC = () => {
       </TouchableOpacity>
       
       {/* Reset Button */}
-      <TouchableOpacity style={styles.resetButton}>
+      <TouchableOpacity style={styles.resetButton} onPress={() => router.push('../expanded-pages/passwordSent')}>
         <Text style={styles.resetText}>Reset Password</Text>
         <Ionicons name="arrow-forward" size={20} color="#fff" />
       </TouchableOpacity>

@@ -4,8 +4,13 @@ import { useNavigation } from '@react-navigation/native';
 import { AuthNavigationProp } from './AppNavigation';
 import { LinearGradient } from 'expo-linear-gradient';
 import { ArrowRight, ArrowLeft } from 'lucide-react-native';
+import { Redirect } from 'expo-router';
+import { useRouter } from 'expo-router';
+
 
 const GuideScreen3 = () => {
+
+  const router = useRouter();
   const navigation = useNavigation<AuthNavigationProp>();
 
   return (
@@ -30,12 +35,12 @@ const GuideScreen3 = () => {
       <View style={{ paddingHorizontal: 20, paddingBottom: 50 }}>
         {/* Title */}
         <Text style={{ fontSize: 28, fontWeight: 'bold', color: 'white', textAlign: 'center' }}>
-          Extensive Workout {'\n'} Libraries
+          Health Metrics &{'\n'} Fitness Analytics
         </Text>
 
         {/* Subtitle */}
         <Text style={{ fontSize: 16, color: '#cccccc', textAlign: 'center', marginVertical: 10 }}>
-        Explore - our large library of exercises made for you! 💪
+        Monitor your health profile with ease. 📈
         </Text>
 
         {/* Navigation Buttons */}
@@ -54,7 +59,7 @@ const GuideScreen3 = () => {
           </TouchableOpacity>
 
           <TouchableOpacity
-            onPress={() => navigation.navigate('SignIn')}
+            onPress={() => router.push('../SignIn')}
             style={{
               paddingVertical: 12,
               paddingHorizontal: 30,
