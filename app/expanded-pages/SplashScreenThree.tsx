@@ -16,7 +16,7 @@ const SplashScreenThree = () => {
 
     const timer = setTimeout(() => {
       router.push('../(tabs)/near-you'); 
-    }, 2000);
+    }, 2500);
 
     return () => clearTimeout(timer);
   }, [fadeAnim, router]);
@@ -25,7 +25,7 @@ const SplashScreenThree = () => {
     <View style={styles.container}>
       <Animated.View style={[styles.messageContainer, { opacity: fadeAnim }]}>  
         <Ionicons name="checkmark-circle" size={60} color="white" />
-        <Text style={styles.text}>You're Going!</Text>
+        <Text style={styles.text}>Great You've Signed Up!</Text>
       </Animated.View>
     </View>
   );

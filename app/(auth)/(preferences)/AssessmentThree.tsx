@@ -7,7 +7,7 @@ const AssessmentThree: React.FC = () => {
   const router = useRouter();
   const [selectedLimitations, setSelectedLimitations] = useState<string[]>([]);
 
-  const limitations = ["Arthritis", "Back Pain", "Asthma", "Obesity", "Knee Pain"];
+  const limitations = ["Arthritis", "Back Pain", "Multiple Sclerosis", "Limited Mobility",  "Obesity", "Other"];
 
   const toggleLimitation = (limitation: string) => {
     if (selectedLimitations.includes(limitation)) {
@@ -24,8 +24,16 @@ const AssessmentThree: React.FC = () => {
     router.push("../AssessmentFour");
   };
 
+  const handleBack = () => {
+    router.back();
+  };
+
   return (
     <View style={styles.container}>
+      <TouchableOpacity style={styles.backButton} onPress={handleBack}>
+        <Text style={styles.backButtonText}>←</Text>
+      </TouchableOpacity>
+      <Text style={styles.headingTitle}>WheelFit</Text>
       <Text style={styles.title}>Assessment</Text>
       <Text style={styles.progress}>3 of 6</Text>
       <Text style={styles.question}>Do you have any physical limitations?</Text>
@@ -50,13 +58,11 @@ const AssessmentThree: React.FC = () => {
           </TouchableOpacity>
         ))}
       </View>
-      <Text style={styles.mostCommon}>Most Common</Text>
-      <View style={styles.commonLimitations}>
-        <Text style={styles.commonLimitation}>Knee Pain X</Text>
-        <Text style={styles.commonLimitation}>Muscle Pain X</Text>
-      </View>
       <TouchableOpacity style={styles.continueButton} onPress={handleContinue}>
         <Text style={styles.continueButtonText}>Continue</Text>
+      </TouchableOpacity>
+      <TouchableOpacity style={styles.skipButton} onPress={() => router.push("/(tabs)")}>
+        <Text style={styles.skipButtonText}>Skip Assessment</Text>
       </TouchableOpacity>
     </View>
   );
@@ -69,6 +75,31 @@ const styles = StyleSheet.create({
     alignItems: "center",
     padding: 20,
     backgroundColor: "#fff",
+    position: 'relative',
+  },
+  backButton: {
+    position: 'absolute',
+    top: 90,
+    left: 20,
+    zIndex: 1,
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: '#f5f5f5',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  backButtonText: {
+    fontSize: 24,
+    color: "#007bff",
+    fontWeight: "bold",
+  },
+  headingTitle: {
+    fontSize: 35,
+    fontWeight: "bold",
+    marginBottom: 10,
+    color: "#333",
+    marginTop: 20,
   },
   title: {
     fontSize: 24,
@@ -77,7 +108,7 @@ const styles = StyleSheet.create({
     color: "#333",
   },
   progress: {
-    fontSize: 16,
+    fontSize: 20,
     marginBottom: 20,
     color: "#666",
   },
@@ -137,6 +168,16 @@ const styles = StyleSheet.create({
     color: "#fff",
     fontSize: 16,
     fontWeight: "bold",
+  },
+  skipButton: {
+    marginTop: 15,
+    paddingVertical: 8,
+    paddingHorizontal: 20,
+  },
+  skipButtonText: {
+    color: "#666",
+    fontSize: 14,
+    textDecorationLine: 'underline',
   },
 });
 

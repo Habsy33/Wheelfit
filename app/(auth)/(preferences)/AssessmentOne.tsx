@@ -24,6 +24,7 @@ const AssessmentOne: React.FC = () => {
 
   return (
     <View style={styles.container}>
+      <Text style={styles.headingTitle}>WheelFit</Text>
       <Text style={styles.title}>Assessment</Text>
       <Text style={styles.progress}>1 of 6</Text>
       <Text style={styles.question}>What's your fitness goal/target?</Text>
@@ -51,6 +52,9 @@ const AssessmentOne: React.FC = () => {
       <TouchableOpacity style={styles.continueButton} onPress={handleContinue}>
         <Text style={styles.continueButtonText}>Continue</Text>
       </TouchableOpacity>
+      <TouchableOpacity style={styles.skipButton} onPress={() => router.push("/(tabs)")}>
+        <Text style={styles.skipButtonText}>Skip Assessment</Text>
+      </TouchableOpacity>
     </View>
   );
 };
@@ -63,6 +67,12 @@ const styles = StyleSheet.create({
     padding: 20,
     backgroundColor: "#fff",
   },
+  headingTitle: {
+    fontSize: 35,
+    fontWeight: "bold",
+    marginBottom: 20,
+    color: "#333",
+  },
   title: {
     fontSize: 24,
     fontWeight: "bold",
@@ -70,7 +80,7 @@ const styles = StyleSheet.create({
     color: "#333",
   },
   progress: {
-    fontSize: 16,
+    fontSize: 20,
     marginBottom: 20,
     color: "#666",
   },
@@ -114,6 +124,16 @@ const styles = StyleSheet.create({
     color: "#fff",
     fontSize: 16,
     fontWeight: "bold",
+  },
+  skipButton: {
+    marginTop: 5,
+    paddingVertical: 8,
+    paddingHorizontal: 20,
+  },
+  skipButtonText: {
+    color: "#666",
+    fontSize: 14,
+    textDecorationLine: 'underline',
   },
 });
 

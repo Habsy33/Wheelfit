@@ -45,7 +45,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
   },
   fadeMessage: {
-    fontSize: 28,
+    fontSize: 32,
     color: '#555',
     fontWeight: 'bold',
   },

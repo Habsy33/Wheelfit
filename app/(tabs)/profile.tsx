@@ -16,11 +16,12 @@ import { signOut } from "firebase/auth";
 import { auth, db, ref, get } from '@/firebaseConfig';
 import { useNavigation } from '@react-navigation/native';
 import { useRouter } from "expo-router";
-import { set} from "firebase/database";
+import { set } from "firebase/database";
 import { deleteUser } from "firebase/auth";
 import { remove } from "firebase/database";
-import { Alert } from "react-native"; 
-
+import { Alert } from "react-native";
+import * as ImagePicker from 'expo-image-picker';
+import { uploadToCloudinary } from '../../cloudinaryConfig';
 
 const Profile = () => {
   const [faceIdEnabled, setFaceIdEnabled] = useState(false);
@@ -30,9 +31,9 @@ const Profile = () => {
   const [isEditing, setIsEditing] = useState(false);
   const [editedFullName, setEditedFullName] = useState('');
   const [editedUsername, setEditedUsername] = useState('');
+  const [profileImageUrl, setProfileImageUrl] = useState<string | null>(null);
   const navigation = useNavigation();
   const router = useRouter();
-
 
   const toggleFaceId = () => setFaceIdEnabled((prev) => !prev);
 
@@ -52,6 +53,7 @@ const Profile = () => {
           const data = snapshot.val();
           setFullName(data.fullName || "User");
           setUsername(data.username || "@unknown");
+          setProfileImageUrl(data.profileImageUrl || null);
         } else {
           console.warn("No user data found in the database.");
         }
@@ -71,6 +73,38 @@ const Profile = () => {
     setEditedUsername(username || '');
   };
 
+  const pickImage = async () => {
+    try {
+      const result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        allowsEditing: true,
+        aspect: [1, 1],
+        quality: 0.5,
+      });
+
+      if (!result.canceled) {
+        setLoading(true);
+        const user = auth.currentUser;
+        if (!user) return;
+
+        try {
+          // Upload to Cloudinary
+          const cloudinaryUrl = await uploadToCloudinary(result.assets[0].uri);
+          setProfileImageUrl(cloudinaryUrl);
+        } catch (error) {
+          console.error("Error uploading image:", error);
+          Alert.alert("Error", "Failed to upload profile picture. Please try again.");
+        } finally {
+          setLoading(false);
+        }
+      }
+    } catch (error) {
+      console.error("Error picking image:", error);
+      setLoading(false);
+      Alert.alert("Error", "Failed to pick image. Please try again.");
+    }
+  };
+
   const handleSave = async () => {
     if (!auth.currentUser) {
       console.warn("No authenticated user found");
@@ -83,6 +117,7 @@ const Profile = () => {
       await set(userRef, {
         fullName: editedFullName,
         username: editedUsername,
+        profileImageUrl: profileImageUrl,
       });
   
       setFullName(editedFullName);
@@ -151,17 +186,31 @@ const Profile = () => {
 
   return (
     <ScrollView style={styles.container}>
-      <Header title="WheelFit" subtitle="Adaptive Home Workouts" streak="28/30" />
+      <Header title="WheelFit" subtitle="Adaptive Home Workouts" />
 
       <View style={styles.meSection}>
         <Text style={styles.meText}>Welcome to WheelFit!</Text>
       </View>
 
       <View style={styles.header}>
-        <Image
-          source={require('@/assets/images/profile_pic.png')}
-          style={styles.profileImage}
-        />
+        <TouchableOpacity 
+          onPress={isEditing ? pickImage : undefined}
+          style={styles.profileImageContainer}
+        >
+          <Image
+            source={
+              profileImageUrl 
+                ? { uri: profileImageUrl }
+                : require('@/assets/images/profile_pic.png')
+            }
+            style={styles.profileImage}
+          />
+          {isEditing && (
+            <View style={styles.editImageOverlay}>
+              <MaterialIcons name="camera-alt" size={20} color="#fff" />
+            </View>
+          )}
+        </TouchableOpacity>
         <View style={styles.profileInfo}>
           {loading ? (
             <ActivityIndicator size="small" color="#000" />
@@ -269,6 +318,9 @@ const styles = StyleSheet.create({
     marginLeft: 10,
     marginRight: 10,
   },
+  profileImageContainer: {
+    position: 'relative',
+  },
   profileImage: {
     width: 60,
     height: 60,
@@ -353,6 +405,17 @@ const styles = StyleSheet.create({
     fontSize: 16,
     width: '100%',
     marginBottom: 10,
+  },
+  editImageOverlay: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    borderRadius: 50,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 });
 

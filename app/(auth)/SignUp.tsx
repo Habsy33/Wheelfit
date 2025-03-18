@@ -5,6 +5,8 @@ import {
   TextInput,
   TouchableOpacity,
   StyleSheet,
+  ScrollView,
+  SafeAreaView,
 } from 'react-native';
 import { Ionicons, FontAwesome } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
@@ -83,11 +85,18 @@ const SignUp: React.FC = () => {
   };
   
   return (
-    <View style={styles.container}>
-      <TouchableOpacity style={styles.backButton} onPress={() => navigation.replace('SignIn')}>
-        <Ionicons name="chevron-back" size={24} color="#000" />
+    <SafeAreaView style={styles.container}>
+      <TouchableOpacity 
+        style={styles.backButton} 
+        onPress={() => router.back()}
+        hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+      >
+        <Ionicons name="chevron-back" size={30} color="#000" />
       </TouchableOpacity>
-      <View style={styles.header}>
+      <ScrollView style={styles.content}>
+        <View style={styles.header}>
+      
+      <Text style={styles.headingTitle}>Wheelfit</Text>
         <Text style={styles.title}>Sign Up For Free</Text>
         <Text style={styles.subtitle}>Quickly make your account in 1 minute</Text>
       </View>
@@ -151,28 +160,40 @@ const SignUp: React.FC = () => {
         <Text style={styles.signUpText}>Sign Up</Text>
         <Ionicons name="arrow-forward" size={20} color="#fff" />
       </TouchableOpacity>
-    </View>
+      </ScrollView>
+    </SafeAreaView>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    paddingHorizontal: 20,
     backgroundColor: '#fff',
-    justifyContent: 'center',
   },
   backButton: {
     position: 'absolute',
     top: 40,
     left: 20,
+    zIndex: 1,
+    padding: 10,
   },
   header: {
     alignItems: 'center',
     marginBottom: 40,
+    marginTop: 100,
+  },
+  content: {
+    flex: 1,
+    paddingHorizontal: 20,
   },
   title: {
     fontSize: 24,
+    fontWeight: 'bold',
+    color: '#000',
+  },
+  headingTitle: {
+    fontSize: 30,
+    top: -10,
     fontWeight: 'bold',
     color: '#000',
   },

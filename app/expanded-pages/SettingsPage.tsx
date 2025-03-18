@@ -9,13 +9,11 @@ import {
 import { Header } from '@/components/Header'; // Importing the Header component
 
 const Settings: React.FC = () => {
-  const dailyStreak = 28; // Example streak value
 
   return (
     <View style={styles.wrapper}>
       {/* Header Component */}
       <Header 
-        streak={`${dailyStreak}/30`} 
         title="WheelFit" 
         subtitle="Adaptive Home Workouts" 
       />

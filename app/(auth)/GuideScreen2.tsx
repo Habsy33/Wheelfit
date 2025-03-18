@@ -1,5 +1,5 @@
-import React from 'react';
-import { View, Text, ImageBackground, TouchableOpacity } from 'react-native';
+import React, { useEffect } from 'react';
+import { View, Text, ImageBackground, TouchableOpacity, Animated } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { AuthNavigationProp } from './AppNavigation';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -7,27 +7,56 @@ import { ArrowRight, ArrowLeft } from 'lucide-react-native';
 
 const GuideScreen2 = () => {
   const navigation = useNavigation<AuthNavigationProp>();
+  const scale = new Animated.Value(1);
+
+  useEffect(() => {
+    const createAnimation = () => {
+      return Animated.sequence([
+        Animated.timing(scale, {
+          toValue: 1.1,
+          duration: 5000,
+          useNativeDriver: true,
+        }),
+        Animated.timing(scale, {
+          toValue: 1,
+          duration: 1000,
+          useNativeDriver: true,
+        })
+      ]);
+    };
+
+    Animated.loop(createAnimation()).start();
+  }, []);
 
   return (
-    <ImageBackground 
-      source={require('@/assets/images/wheelfit_background3.png')}
-      style={{ flex: 1, justifyContent: 'flex-end' }}
-      resizeMode="cover"
-    >
+    <View style={{ flex: 1 }}>
+      <Animated.View style={{
+        position: 'absolute',
+        width: '100%',
+        height: '100%',
+        transform: [{ scale }]
+      }}>
+        <ImageBackground 
+          source={require('@/assets/images/wheelfit_background3.png')}
+          style={{ flex: 1 }}
+          resizeMode="cover"
+        />
+      </Animated.View>
+
       {/* Overlay for better text visibility */}
       <LinearGradient 
         colors={['transparent', 'rgba(0, 0, 0, 0.8)']} 
         style={{ position: 'absolute', width: '100%' , height: '100%' }}
       />
 
-            {/* Progress Bar */}
-            <View style={{ position: 'absolute', top: 70, left: 0, right: 0, paddingHorizontal: 20 }}>
+      {/* Progress Bar */}
+      <View style={{ position: 'absolute', top: 70, left: 0, right: 0, paddingHorizontal: 20 }}>
         <View style={{ height: 5, backgroundColor: '#555', borderRadius: 5, overflow: 'hidden' }}>
           <View style={{ width: '66%', height: '100%', backgroundColor: '#FFF' }} />
         </View>
       </View>
 
-      <View style={{ paddingHorizontal: 20, paddingBottom: 50 }}>
+      <View style={{ flex: 1, justifyContent: 'flex-end', paddingHorizontal: 20, paddingBottom: 50 }}>
         {/* Title */}
         <Text style={{ fontSize: 28, fontWeight: 'bold', color: 'white', textAlign: 'center' }}>
           Extensive Workout {'\n'} Libraries
@@ -75,7 +104,7 @@ const GuideScreen2 = () => {
           Already have an account? <Text style={{ textDecorationLine: 'underline' }}>Sign In</Text>
         </Text>
       </View>
-    </ImageBackground>
+    </View>
   );
 };
 

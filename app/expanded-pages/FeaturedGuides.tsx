@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, Image, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, Text, Image, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
 import { Header } from '@/components/Header';
@@ -9,13 +9,19 @@ import { useRouter } from 'expo-router';
 const FeaturedGuides = () => {
   const router = useRouter();
   const navigation = useNavigation();
-  const { title, duration, level, image, description, equipment, intensity } = useLocalSearchParams(); 
+  const params = useLocalSearchParams();
+  
+  // Parse the exercises array from the JSON string
+  const exercises = params.exercises ? JSON.parse(params.exercises as string) : [];
 
   return (
-    <View style={{ flex: 1, backgroundColor: '#1a202c', paddingBottom: 20 }}>
+    <ScrollView style={{ flex: 1, backgroundColor: '#1a202c' }}>
       {/* Header Component */}
       <View style={styles.featuredHeader}>
-      <Header title="WheelFit" streak="28/30" subtitle={Array.isArray(title) ? title[0] : title || "Adaptive Strength Workout"} />
+        <Header 
+          title="WheelFit"  
+          subtitle={Array.isArray(params.title) ? params.title[0] : params.title || "Adaptive Strength Workout"} 
+        />
       </View>
 
       {/* Hero Section */}
@@ -27,15 +33,14 @@ const FeaturedGuides = () => {
           <Ionicons name="chevron-back" size={24} color="white" />
         </TouchableOpacity>
 
-
         <View style={styles.overlay}>
-        <Image
-          source={image ? { uri: image } : require('@/assets/images/wheelchairguy1.jpg')}
-          style={styles.heroImage}
-        />
-          <Text style={styles.workoutTitle}>{title || "Adaptive Strength Workout"}</Text>
+          <Image
+            source={params.image ? { uri: params.image as string } : require('@/assets/images/wheelchairguy1.jpg')}
+            style={styles.heroImage}
+          />
+          <Text style={styles.workoutTitle}>{params.title || "Adaptive Strength Workout"}</Text>
           <Text style={styles.workoutDescription}>
-            {duration ? `${duration} • ${level}` : "Build core strength, improve mobility, and stay active."}
+            {params.duration ? `${params.duration} • ${params.level}` : "Build core strength, improve mobility, and stay active."}
           </Text>
         </View>
       </View>
@@ -43,17 +48,19 @@ const FeaturedGuides = () => {
       {/* Workout Description */}
       <View style={styles.descriptionContainer}>
         <Text style={styles.sectionTitle}>About This Workout</Text>
-        <Text style={styles.sectionText}>{description || "A 4-week fitness plan designed for wheelchair users, focusing on upper body strength, endurance, and core stability. No gym required!"}</Text>
+        <Text style={styles.sectionText}>
+          {params.description || "A 4-week fitness plan designed for wheelchair users, focusing on upper body strength, endurance, and core stability. No gym required!"}
+        </Text>
       </View>
 
       {/* Program Details */}
       <View style={styles.programDetailsContainer}>
         <Text style={styles.sectionTitle}>Program Details</Text>
         {[ 
-          equipment ? `Equipment: ${equipment}` : 'Equipment optional (Resistance bands, weights)',
-          duration ? `Duration: ${duration}` : '8-27 mins / day',
-          level ? `Intensity: ${level}` : 'Wheelchair-accessible workouts',
-          intensity ? `Workout Intensity: ${intensity}` : null,
+          params.equipment ? `Equipment: ${params.equipment}` : 'Equipment optional (Resistance bands, weights)',
+          params.duration ? `Duration: ${params.duration}` : '8-27 mins / day',
+          params.level ? `Intensity: ${params.level}` : 'Wheelchair-accessible workouts',
+          params.intensity ? `Workout Intensity: ${params.intensity}` : null,
         ].filter(Boolean).map((detail, index) => (
           <View key={index} style={styles.programDetailItem}>
             <View style={styles.bulletPoint} />
@@ -62,14 +69,29 @@ const FeaturedGuides = () => {
         ))}
       </View>
 
+      {/* Exercises List */}
+      <View style={styles.exercisesContainer}>
+        <Text style={styles.sectionTitle}>Exercises</Text>
+        {exercises.map((exercise: string, index: number) => (
+          <View key={index} style={styles.exerciseItem}>
+            <View style={styles.exerciseNumber}>
+              <Text style={styles.exerciseNumberText}>{index + 1}</Text>
+            </View>
+            <Text style={styles.exerciseText}>{exercise}</Text>
+          </View>
+        ))}
+      </View>
+
       {/* Start Workout Button */}
       <View style={styles.startButtonContainer}>
-        <TouchableOpacity style={styles.startButton}
-                  onPress={() => router.push('../expanded-pages/SplashScreenFour')}>
+        <TouchableOpacity 
+          style={styles.startButton}
+          onPress={() => router.push('../expanded-pages/SplashScreenFour')}
+        >
           <Text style={styles.startButtonText}>Start Workout</Text>
-          </TouchableOpacity>
+        </TouchableOpacity>
       </View>
-    </View>
+    </ScrollView>
   );
 };
 
@@ -162,6 +184,38 @@ const styles = StyleSheet.create({
     color: 'white',
     fontSize: 16,
     fontWeight: 'bold',
+  },
+  exercisesContainer: {
+    padding: 16,
+    backgroundColor: '#2d3748',
+    margin: 16,
+    borderRadius: 8,
+  },
+  exerciseItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 12,
+    backgroundColor: '#1a202c',
+    padding: 12,
+    borderRadius: 8,
+  },
+  exerciseNumber: {
+    width: 24,
+    height: 24,
+    backgroundColor: '#4299e1',
+    borderRadius: 12,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: 12,
+  },
+  exerciseNumberText: {
+    color: 'white',
+    fontWeight: 'bold',
+  },
+  exerciseText: {
+    color: 'white',
+    fontSize: 16,
+    flex: 1,
   },
 });
 

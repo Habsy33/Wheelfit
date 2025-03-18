@@ -27,9 +27,17 @@ const AssessmentSix: React.FC = () => {
     router.push("/(tabs)"); // Redirect to the index page after setup
   };
 
+  const handleBack = () => {
+    router.back();
+  };
+
   return (
     <ScrollView contentContainerStyle={styles.scrollContainer}>
       <View style={styles.container}>
+        <TouchableOpacity style={styles.backButton} onPress={handleBack}>
+          <Text style={styles.backButtonText}>←</Text>
+        </TouchableOpacity>
+        <Text style={styles.headingTitle}>WheelFit</Text>
         <Text style={styles.title}>Assessment</Text>
         <Text style={styles.subtitle}>6 of 6</Text>
         <Text style={styles.question}>Do you have a specific Exercise Preference?</Text>
@@ -73,6 +81,30 @@ const styles = StyleSheet.create({
     alignItems: "center",
     padding: 20,
     backgroundColor: "#fff",
+    position: 'relative',
+  },
+  backButton: {
+    position: 'absolute',
+    top: 90,
+    left: 20,
+    zIndex: 1,
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: '#f5f5f5',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  backButtonText: {
+    fontSize: 24,
+    color: "#007bff",
+    fontWeight: "bold",
+  },
+  headingTitle: {
+    fontSize: 35,
+    fontWeight: "bold",
+    marginBottom: 20,
+    color: "#333",
   },
   title: {
     fontSize: 24,
@@ -82,7 +114,6 @@ const styles = StyleSheet.create({
   },
   subtitle: {
     fontSize: 20,
-    fontWeight: "bold",
     marginBottom: 20,
     color: "#333",
   },

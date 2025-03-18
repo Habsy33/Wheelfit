@@ -7,44 +7,39 @@ import {
   TouchableOpacity,
   Image,
   SafeAreaView,
+  Alert,
 } from 'react-native';
 import { ThemedView } from '@/components/ThemedView';
 import { ThemedText } from '@/components/ThemedText';
 import { useColorScheme } from '@/hooks/useColorScheme';
 import { WebView } from 'react-native-webview';
-import { Header } from '@/components/Header'; // Importing the Header component
+import { Header } from '@/components/Header';
 import MapView, { Marker } from 'react-native-maps';
 import Constants from 'expo-constants';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useRouter } from 'expo-router';
-
-// import { GOOGLE_MAPS_API_KEY } from "@env";
-// console.log(GOOGLE_MAPS_API_KEY); // Check if it's loading correctly
-
+import { fetchEventsTracking, deleteEventTracking, EventTrackingData } from '@/utils/eventsTracking';
+import { Ionicons } from '@expo/vector-icons';
 
 const eventsData = [
   {
     title: 'EXERCISE CLASS WITH ELLA',
-    date: '15th Jan',
-    description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
+    description: "Ella's friendly, engaging and knowledgeable style has made her a firm favourite with the disabled community throughout the UK. No gym required!",
     image: require('@/assets/images/exercise_class_ella.jpg'),
   },
   {
     title: 'DISCOVER TAI CHI',
-    date: '18th Jan',
     description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
     image: require('@/assets/images/tai_chi.jpg'),
   },
   {
     title: 'DISCOVER MORE TAI CHI',
-    date: '18th Jan',
     description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
     image: require('@/assets/images/tai_chi.jpg'),
   },
   {
     title: 'EXTENDED EXERCISE CLASS WITH ELLA',
-    date: '15th Jan',
-    description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
+    description: "Ella's friendly, engaging and knowledgeable style has made her a firm favourite with the disabled community throughout the UK. No gym required!",
     image: require('@/assets/images/exercise_class_ella.jpg'),
   },
 ];
@@ -56,66 +51,163 @@ const fitnessCentersData = [
   { name: 'Powerhouse Glasgow', details: '6am - 10pm / General Gym', category: 'General', distance: 3.4, image: require('@/assets/images/accessible_gym.jpg') },
 ];
 
+const EventCard = ({ event, onDelete }: { event: EventTrackingData; onDelete: (eventId: string) => void }) => {
+  const handleDelete = () => {
+    Alert.alert(
+      "Cancel Event",
+      "Are you sure you want to cancel your registration for this event?",
+      [
+        {
+          text: "No, Keep It",
+          style: "cancel"
+        },
+        {
+          text: "Yes, Cancel",
+          style: "destructive",
+          onPress: () => onDelete(event.eventId)
+        }
+      ]
+    );
+  };
+
+  return (
+    <View style={styles.eventCard}>
+      <View style={styles.eventHeader}>
+        <View style={styles.eventTitleContainer}>
+          <Text style={styles.eventTitle}>{event.eventName}</Text>
+          <Text style={styles.eventDate}>{event.eventDate}</Text>
+        </View>
+        <TouchableOpacity 
+          onPress={handleDelete}
+          style={styles.deleteButton}
+        >
+          <Ionicons name="trash-outline" size={20} color="#ff4444" />
+        </TouchableOpacity>
+      </View>
+      <Text style={styles.eventDescription}>{event.eventDescription}</Text>
+    </View>
+  );
+};
+
 export default function NearYou() {
   const colorScheme = useColorScheme();
   const router = useRouter();
-
-  // const GOOGLE_MAPS_API_KEY = process.env.EXPO_PUBLIC_GOOGLE_MAPS_API_KEY;
-
+  const [searchQuery, setSearchQuery] = useState('');
 
   const GOOGLE_MAPS_API_KEY = Constants.expoConfig?.extra?.GOOGLE_MAPS_API_KEY;
   console.log('Google Maps API Key:', GOOGLE_MAPS_API_KEY);
 
-  const renderEventCard = (event: any) => (
-    <TouchableOpacity 
-    key={event.title} 
-    style={styles.eventCard} 
-    onPress={() => router.push('../expanded-pages/FeaturedEvents')}>
-    <View style={styles.smallBox}>
-      <Text style={styles.smallBoxText}>20/02/25</Text>
-    </View>
-    <Image source={event.image} style={styles.eventImage} />
-    <Text style={styles.eventDate}>{event.date}</Text>
-    <Text style={styles.eventTitle}>{event.title}</Text>
-    <Text style={styles.eventDescription}>{event.description}</Text>
-  </TouchableOpacity>
-  );
+  const getFilteredEvents = () => {
+    if (!searchQuery.trim()) {
+      return eventsData;
+    }
+    
+    const query = searchQuery.toLowerCase().trim();
+    return eventsData.filter(event => 
+      event.title.toLowerCase().includes(query) ||
+      event.description.toLowerCase().includes(query)
+    );
+  };
+
+  const renderEventCard = (event: any) => {
+    const truncatedDescription = event.description.length > 50 
+      ? `${event.description.substring(0, 50)}...` 
+      : event.description;
+  
+    return (
+      <TouchableOpacity 
+        key={event.title} 
+        style={styles.featuredEventCard} 
+        onPress={() => router.push({ 
+          pathname: "../expanded-pages/FeaturedEvents", 
+          params: { 
+            title: event.title, 
+            description: event.description,
+            date: "20/02/25",
+            image: event.image,
+          } 
+        })}
+      >
+        <View style={styles.smallBox}>
+          <Text style={styles.smallBoxText}>20/02/25</Text>
+        </View>
+        <Image source={event.image} style={styles.eventImage} />
+        <View style={styles.featuredEventContent}>
+          <Text style={styles.featuredEventTitle}>{event.title}</Text>
+          <Text style={styles.featuredEventDescription}>{truncatedDescription}</Text>
+        </View>
+      </TouchableOpacity>
+    );
+  };
 
   const renderFitnessCenterCard = (center: any) => (
     <View style={styles.fitnessCenterCard} key={center.name}>
       <Image source={center.image} style={styles.fitnessCenterImage} />
       <View style={styles.fitnessCenterDetails}>
         <Text style={styles.fitnessCenterName}>{center.name}</Text>
-        <Text style={styles.fitnessCenterInfo}>{center.details}</Text>
+        <Text style={styles.fitnessCenterInfo}>{center.details} ( {center.distance} km )</Text>
       </View>
     </View>
   );
 
   const [selectedFilter, setSelectedFilter] = useState<string | null>(null);
-  
-    const getFilteredFitnessCenters = () => {
-      let filteredCenters = [...fitnessCentersData];
-      if (selectedFilter === 'Accessible') {
-        filteredCenters = filteredCenters.filter(center => center.category === 'Accessible');
-      } else if (selectedFilter === 'Park') {
-        filteredCenters = filteredCenters.filter(center => center.category === 'Park');
-      } else if (selectedFilter === 'Close by') {
-        filteredCenters.sort((a, b) => a.distance - b.distance);
-      }
-      return filteredCenters;
-    };
+
+  const getFilteredFitnessCenters = () => {
+    let filteredCenters = [...fitnessCentersData];
+    if (selectedFilter === 'Accessible') {
+      filteredCenters = filteredCenters.filter(center => center.category === 'Accessible');
+    } else if (selectedFilter === 'Park') {
+      filteredCenters = filteredCenters.filter(center => center.category === 'Park');
+    } else if (selectedFilter === 'Close by') {
+      filteredCenters.sort((a, b) => a.distance - b.distance);
+    }
+    return filteredCenters;
+  };
+
+  const [events, setEvents] = useState<EventTrackingData[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetchEventsTracking((fetchedEvents) => {
+      setEvents(fetchedEvents);
+      setLoading(false);
+    });
+  }, []);
+
+  const handleDeleteEvent = async (eventId: string) => {
+    try {
+      await deleteEventTracking(eventId);
+      // The events list will automatically update due to the onValue listener in fetchEventsTracking
+    } catch (error) {
+      console.error("Error deleting event:", error);
+      // You might want to show an error message to the user here
+    }
+  };
 
   return (
     <SafeAreaView style={styles.safeArea}>
       <ThemedView style={styles.container}>
-        <Header streak="7/7" title="WheelFit" subtitle="Find Events and Centers Near You" />
-        <TextInput style={styles.searchInput} placeholder="Search workouts, plans..." placeholderTextColor="#A9A9A9" />
+        <Header title="WheelFit" subtitle="Find Events and Centers Near You" />
+        <TextInput 
+          style={styles.searchInput} 
+          placeholder="Search workouts, plans..." 
+          placeholderTextColor="#A9A9A9"
+          value={searchQuery}
+          onChangeText={setSearchQuery}
+        />
         <ScrollView style={styles.content}>
           <Text style={styles.sectionTitle}>Events Near You</Text>
           <Text style={styles.featuredText}>Featured Events</Text>
-          <ScrollView horizontal={true} showsHorizontalScrollIndicator={false} contentContainerStyle={styles.eventsContainer}>
-          <View style={styles.eventsContainer}>{eventsData.map(renderEventCard)}</View>
+          <ScrollView 
+            horizontal={true} 
+            showsHorizontalScrollIndicator={false} 
+            contentContainerStyle={styles.featuredEventsContainer}
+          >
+            {getFilteredEvents().map(renderEventCard)}
           </ScrollView>
+
+          <View style={styles.sectionDivider} />
+          
           <Text style={styles.sectionSubtitle}>Search Local Fitness Centers</Text>
           <View style={styles.mapContainer}>
             <MapView
@@ -124,33 +216,35 @@ export default function NearYou() {
             >
               <Marker coordinate={{ latitude: 55.8642, longitude: -4.2518 }} title="Glasgow" />
             </MapView>
-            </View>
-      
-            <View style={styles.filterContainer}>
-                      {['Accessible Venues', 'Parks', 'Close by'].map(filter => (
-                        <TouchableOpacity key={filter} style={styles.filterButton} onPress={() => setSelectedFilter(filter)}>
-                          <Text style={styles.filterButtonText}>{filter}</Text>
-                        </TouchableOpacity>
-                      ))}
-                    </View>
-                    <View style={styles.fitnessCentersContainer}>
-                      {getFilteredFitnessCenters().map(center => (
-                        <View style={styles.fitnessCenterCard} key={center.name}>
-                          <Image source={center.image} style={styles.fitnessCenterImage} />
-                          <View style={styles.fitnessCenterDetails}>
-                            <Text style={styles.fitnessCenterName}>{center.name}</Text>
-                            <Text style={styles.fitnessCenterInfo}>{center.details} ( {center.distance} km )</Text>
-                          </View>
-                        </View>
-                      ))}
-                    </View>
-          {/* </View>
-          <View style={styles.filterContainer}>
-            <TouchableOpacity style={styles.filterButton}><Text style={styles.filterButtonText}>Accessible Venues</Text></TouchableOpacity>
-            <TouchableOpacity style={styles.filterButton}><Text style={styles.filterButtonText}>Parks</Text></TouchableOpacity>
-            <TouchableOpacity style={styles.filterButton}><Text style={styles.filterButtonText}>Close by</Text></TouchableOpacity>
           </View>
-          <View style={styles.fitnessCentersContainer}>{fitnessCentersData.map(renderFitnessCenterCard)}</View> */}
+
+          <View style={styles.filterContainer}>
+            {['Accessible Venues', 'Parks', 'Close by'].map(filter => (
+              <TouchableOpacity key={filter} style={styles.filterButton} onPress={() => setSelectedFilter(filter)}>
+                <Text style={styles.filterButtonText}>{filter}</Text>
+              </TouchableOpacity>
+            ))}
+          </View>
+          <View style={styles.fitnessCentersContainer}>
+            {getFilteredFitnessCenters().map(center => (
+              <View style={styles.fitnessCenterCard} key={center.name}>
+                <Image source={center.image} style={styles.fitnessCenterImage} />
+                <View style={styles.fitnessCenterDetails}>
+                  <Text style={styles.fitnessCenterName}>{center.name}</Text>
+                  <Text style={styles.fitnessCenterInfo}>{center.details} ( {center.distance} km )</Text>
+                </View>
+              </View>
+            ))}
+          </View>
+          <ScrollView style={styles.eventsList}>
+            {events.map((event) => (
+              <EventCard 
+                key={event.eventId} 
+                event={event} 
+                onDelete={handleDeleteEvent}
+              />
+            ))}
+          </ScrollView>
         </ScrollView>
       </ThemedView>
     </SafeAreaView>
@@ -160,61 +254,95 @@ export default function NearYou() {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: '#FFF', // Set background color to #FFF
+    backgroundColor: '#FFF',
     marginTop: -60,
   },
   container: {
     flex: 1,
-    backgroundColor: '#FFF', // Set background color to #FFF
+    backgroundColor: '#FFF',
   },
   content: {
     flex: 1,
+    marginTop: -20,
   },
   sectionTitle: {
-    fontSize: 30, // Increased font size
+    fontSize: 28,
     fontWeight: 'bold',
-    marginVertical: 8,
-    padding: 10,
-    marginTop: -15,
+    color: '#333',
+    marginVertical: 16,
+    paddingHorizontal: 16,
   },
   sectionSubtitle: {
-    fontSize: 20, // Increased font size
+    fontSize: 20,
     fontWeight: 'bold',
-    marginVertical: 8,
-    padding: 10,
-    marginTop: -30,
-    marginLeft: 45,
+    color: '#333',
+    marginBottom: 16,
+    paddingHorizontal: 16,
   },
   featuredText: {
     fontSize: 18,
     fontWeight: '600',
     color: '#555',
-    marginBottom: 8,
-    marginTop: -20,
-    padding: 12.5,
+    marginBottom: 12,
+    paddingHorizontal: 16,
   },
-  eventsContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    flexWrap: 'wrap',
+  featuredEventsContainer: {
+    paddingHorizontal: 16,
+    paddingBottom: 8,
+  },
+  featuredEventCard: {
+    width: 280,
+    backgroundColor: '#FFF',
+    borderRadius: 12,
+    marginRight: 16,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
+    borderWidth: 1,
+    borderColor: '#E5E5E5',
+    overflow: 'hidden',
+  },
+  featuredEventContent: {
+    padding: 12,
+  },
+  featuredEventTitle: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: '#333',
+    marginBottom: 4,
+  },
+  featuredEventDescription: {
+    fontSize: 14,
+    color: '#666',
+    lineHeight: 20,
+  },
+  eventImage: {
+    width: '100%',
+    height: 120,
+    resizeMode: 'cover',
+  },
+  sectionDivider: {
+    marginTop: -20,
+    height: 1,
+    marginVertical: 24,
   },
   smallBox: {
     position: 'absolute',
     top: 5,
-    left: 5, // Add padding for better positioning
+    left: 5,
     backgroundColor: '#007BFF',
     borderRadius: 4,
-    paddingHorizontal: 6, // Slightly wider for text fit
-    paddingVertical: 2, // Adjust height for text fit
-    zIndex: 10, // Ensure it stacks above other elements
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+    zIndex: 10,
     alignItems: 'center',
-      // Shadow for iOS
     shadowColor: '#000',
-    shadowOffset: { width: 1, height: 3 }, // Horizontal and vertical shadow offset
-    shadowOpacity: 0.7, // Opacity of the shadow
-    shadowRadius: 4, // How blurry the shadow is
-    // Shadow for Android
-    elevation: 3, // Elevation value for Android shadows
+    shadowOffset: { width: 1, height: 3 },
+    shadowOpacity: 0.7,
+    shadowRadius: 4,
+    elevation: 3,
   },
   smallBoxText: {
     color: '#FFF',
@@ -222,83 +350,108 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   eventCard: {
-    width: 250, // Set a fixed width instead of percentage
     backgroundColor: '#FFF',
-    borderRadius: 8,
-    padding: 10,
-    marginRight: 10, // Space between cards
+    borderRadius: 12,
+    padding: 16,
+    marginBottom: 12,
     shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 4,
-    shadowOffset: { width: 0, height: 2 },
-    elevation: 2,
-    position: 'relative',
-    overflow: 'hidden',
-    marginBottom: 20,
+    elevation: 3,
+    borderWidth: 1,
+    borderColor: '#E5E5E5',
   },
-   
-  eventImage: {
-    width: '100%',
-    height: 100,
-    borderRadius: 8,
+  eventHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'flex-start',
+    marginBottom: 8,
   },
-  eventDate: {
-    marginTop: 8,
-    fontWeight: 'bold',
-    fontSize: 14,
+  eventTitleContainer: {
+    flex: 1,
+    marginRight: 8,
   },
   eventTitle: {
-    fontSize: 14,
+    fontSize: 16,
     fontWeight: 'bold',
+    color: '#333',
+    marginBottom: 4,
+  },
+  eventDate: {
+    fontSize: 14,
+    color: '#666',
   },
   eventDescription: {
-    fontSize: 12,
+    fontSize: 14,
     color: '#555',
+    lineHeight: 20,
   },
-  mapContainer: { width: '100%', height: 200, borderRadius: 8, overflow: 'hidden', marginVertical: 10, padding: 10, marginTop: -10,},
-  map: { width: '100%', height: '100%' , borderRadius: 20},
+  deleteButton: {
+    padding: 8,
+    backgroundColor: '#FFF5F5',
+    borderRadius: 8,
+  },
+  mapContainer: {
+    height: 200,
+    borderRadius: 12,
+    overflow: 'hidden',
+    marginHorizontal: 16,
+    marginBottom: 16,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  map: {
+    width: '100%',
+    height: '100%',
+    borderRadius: 20,
+  },
   filterContainer: {
     flexDirection: 'row',
-    justifyContent: 'center',  
-    alignItems: 'center',       
-    gap: 10,                    
-    flexWrap: 'wrap',           
-    marginVertical: 12,         
-    marginTop: -10,              
-},
-filterButton: {
-  backgroundColor: '#3194ff',
-  paddingVertical: 7,
-  paddingHorizontal: 7, 
-  borderRadius: 10,          
-  minWidth: 100,             
-  alignItems: 'center',
-},
-filterButtonText: {
-  color: '#FFF',
-  fontWeight: 'bold',        
-  textAlign: 'center',
-},
+    justifyContent: 'center',
+    alignItems: 'center',
+    gap: 12,
+    flexWrap: 'wrap',
+    marginVertical: 16,
+    paddingHorizontal: 16,
+  },
+  filterButton: {
+    backgroundColor: '#005CEE',
+    paddingVertical: 8,
+    paddingHorizontal: 16,
+    borderRadius: 20,
+    minWidth: 120,
+    alignItems: 'center',
+  },
+  filterButtonText: {
+    color: '#FFF',
+    fontWeight: '600',
+    fontSize: 14,
+  },
   fitnessCentersContainer: {
-    marginTop: 16,
+    paddingHorizontal: 16,
   },
   fitnessCenterCard: {
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: '#FFF',
-    borderRadius: 8,
-    padding: 8,
-    marginBottom: 8,
+    borderRadius: 12,
+    padding: 12,
+    marginBottom: 12,
     shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 4,
-    shadowOffset: { width: 0, height: 2 },
-    elevation: 2,
+    elevation: 3,
+    borderWidth: 1,
+    borderColor: '#E5E5E5',
   },
-  
   fitnessCenterImage: {
-    width: 60,
-    height: 60,
+    width: 70,
+    height: 70,
     borderRadius: 8,
     marginRight: 16,
   },
@@ -306,17 +459,26 @@ filterButtonText: {
     flex: 1,
   },
   fitnessCenterName: {
+    fontSize: 16,
     fontWeight: 'bold',
-    fontSize: 14,
+    color: '#333',
+    marginBottom: 4,
   },
   fitnessCenterInfo: {
-    fontSize: 12,
-    color: '#555',
+    fontSize: 14,
+    color: '#666',
   },
   searchInput: {
     backgroundColor: '#FFF',
-    padding: 10,
-    borderRadius: 8,
+    padding: 12,
+    borderRadius: 12,
+    marginHorizontal: 16,
     marginBottom: 16,
+    fontSize: 16,
+    borderWidth: 1,
+    borderColor: '#E5E5E5',
+  },
+  eventsList: {
+    marginTop: 16,
   },
 });
