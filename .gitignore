@@ -36,12 +36,8 @@ yarn-error.*
 # typescript
 *.tsbuildinfo
 
-firebaseConfig.ts
-
 app-example
 
-
-babel.config.js
 
 # Expo Constants
 .expo-constants/
