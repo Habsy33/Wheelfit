@@ -13,6 +13,12 @@ export interface EventTrackingData {
   timestamp: number;
 }
 
+export interface EventParticipant {
+  userId: string;
+  username: string;
+  profilePicture?: string;
+}
+
 export const trackEventSignUp = async (
   eventName: string,
   eventDate: string,
@@ -108,5 +114,42 @@ export const deleteEventTracking = async (eventId: string) => {
     }
   } catch (error) {
     console.error("Error deleting event:", error);
+  }
+};
+
+export const fetchEventParticipants = async (eventName: string): Promise<EventParticipant[]> => {
+  const eventsTrackingRef = ref(db, "eventsTracking");
+  
+  try {
+    const snapshot = await get(eventsTrackingRef);
+    if (snapshot.exists()) {
+      const data = snapshot.val();
+      const participants: EventParticipant[] = [];
+      
+      // Get all events that match the event name
+      for (const [eventId, eventData] of Object.entries(data)) {
+        const typedEventData = eventData as EventTrackingData;
+        if (typedEventData.eventName === eventName) {
+          // Fetch user details for each participant
+          const userRef = ref(db, `users/${typedEventData.userId}`);
+          const userSnapshot = await get(userRef);
+          
+          if (userSnapshot.exists()) {
+            const userData = userSnapshot.val();
+            participants.push({
+              userId: typedEventData.userId,
+              username: userData.username || "Anonymous",
+              profilePicture: userData.profilePicture
+            });
+          }
+        }
+      }
+      
+      return participants;
+    }
+    return [];
+  } catch (error) {
+    console.error("Error fetching event participants:", error);
+    return [];
   }
 };

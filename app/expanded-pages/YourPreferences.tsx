@@ -12,12 +12,14 @@ import {
 import { Header } from '@/components/Header';
 import { getPreferences, updatePreferences } from '@/utils/preferences'; // Import updatePreferences
 import { auth } from '@/firebaseConfig';
-import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { MaterialCommunityIcons, MaterialIcons } from '@expo/vector-icons';
+import { useRouter } from 'expo-router';
 
 type PreferenceKey = 'goal' | 'gender' | 'limitation' | 'age' | 'weight' | 'height' | 'preference';
 type IconName = React.ComponentProps<typeof MaterialCommunityIcons>['name'];
 
 const YourPreferences = () => {
+  const router = useRouter();
   const [loading, setLoading] = useState(true);
   const [isEditing, setIsEditing] = useState(false);
   const [preferences, setPreferences] = useState<{
@@ -148,6 +150,15 @@ const YourPreferences = () => {
     <ScrollView style={styles.container}>
       <Header title="WheelFit" subtitle="Adaptive Home Workouts" />
 
+      {/* Back Button */}
+      <TouchableOpacity 
+        style={styles.backButton} 
+        onPress={() => router.back()}
+      >
+        <MaterialIcons name="arrow-back" size={24} color="#007BFF" />
+        <Text style={styles.backButtonText}>Back</Text>
+      </TouchableOpacity>
+
       <View style={styles.headerContainer}>
         <Text style={[styles.title, isEditing && styles.titleEditing]}>Your Preferences</Text>
         {!isEditing ? (
@@ -195,6 +206,17 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#f5f5f5',
     marginTop: -50,
+  },
+  backButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 16,
+    marginBottom: -20,
+  },
+  backButtonText: {
+    fontSize: 16,
+    color: '#007BFF',
+    marginLeft: 8,
   },
   headerContainer: {
     flexDirection: 'row',

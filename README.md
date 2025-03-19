@@ -10,10 +10,10 @@ This is an [Expo](https://expo.dev) project created with [`create-expo-app`](htt
    npm install
    ```
 
-2. Start the app
+2. Start the app (--clear flag removes previous cache if there are any)
 
    ```bash
-    npx expo start
+    npx expo start --clear
    ```
 
 In the output, you'll find options to open the app in a

@@ -88,7 +88,7 @@ const Forum: React.FC = () => {
   const [editingPost, setEditingPost] = useState<Post | null>(null);
   const [editTitle, setEditTitle] = useState("");
   const [editContent, setEditContent] = useState("");
-  const INITIAL_POSTS_TO_SHOW = 2; // Number of posts to show initially
+  const INITIAL_POSTS_TO_SHOW = 1; // Changed from 2 to 1
   const [postLikes, setPostLikes] = useState<{ [key: string]: number }>({});
 
   // Fetch posts from the database on component mount
@@ -117,7 +117,7 @@ const Forum: React.FC = () => {
     );
 
   // Get limited or full list of posts based on showAllPosts state
-  const displayedPosts = showAllPosts ? filteredPosts : filteredPosts.slice(0, INITIAL_POSTS_TO_SHOW);
+  const displayedPosts = showAllPosts ? filteredPosts : filteredPosts.slice(0, INITIAL_POSTS_TO_SHOW + 1);
 
   // Handle creating a new post with validation
   const handleCreatePost = async () => {
@@ -181,10 +181,23 @@ const Forum: React.FC = () => {
     { id: 'filters', type: 'filters' },
     { id: 'createPost', type: 'createPost' },
     ...displayedPosts,
-    ...(filteredPosts.length > INITIAL_POSTS_TO_SHOW && !showAllPosts ? [{ id: 'showMore', type: 'showMore' as const }] : []),
     { id: 'meetupsHeader', type: 'header' },
     ...meetups,
   ];
+
+  // Add show more button if there are more posts
+  const showMoreButton = filteredPosts.length > INITIAL_POSTS_TO_SHOW + 1 && !showAllPosts ? (
+    <TouchableOpacity 
+      style={styles.showMoreButton}
+      onPress={() => setShowAllPosts(true)}
+      accessibilityLabel="Show more posts"
+      accessibilityHint="Double tap to show all forum posts"
+    >
+      <Text style={styles.showMoreText}>
+        Show More Posts ({filteredPosts.length - (INITIAL_POSTS_TO_SHOW + 1)} more)...
+      </Text>
+    </TouchableOpacity>
+  ) : null;
 
   const handleDeletePost = async (postId: string) => {
     Alert.alert(
@@ -346,109 +359,116 @@ const Forum: React.FC = () => {
         );
       case 'post':
         const isCurrentUserPost = auth.currentUser?.uid === item.userId;
+        const isSecondPost = !showAllPosts && displayedPosts.indexOf(item) === 1;
         return (
-          <TouchableOpacity 
-            style={styles.postContainer} 
-            onPress={() => router.push({
-              pathname: '../expanded-pages/discussionPage',
-              params: {
-                id: item.id,
-                title: item.title,
-                author: item.author,
-                views: item.views,
-                likes: postLikes[item.id] || item.likes,
-                comments: item.comments,
-                content: item.content,
-                tags: JSON.stringify(item.tags),
-                profileImageUrl: item.profileImageUrl || null,
-                timestamp: item.timestamp
-              }
-            })}
-            accessibilityLabel={`Post: ${item.title}`}
-            accessibilityHint="Double tap to view full post"
-          >
-            <View style={styles.postContainer}>
-              <Text style={styles.postTitle}>{item.title}</Text>
-              <Text style={styles.postPreview} numberOfLines={2}>
-                {item.content}
-              </Text>
-              <View style={styles.tagsContainer}>
-                {item.tags.map((tag, index) => (
-                  <View key={index} style={styles.tag}>
-                    <Text style={styles.tagText}>{tag}</Text>
-                  </View>
-                ))}
-              </View>
-              <View style={styles.postFooter}>
-                <View style={styles.authorInfo}>
-                  <Image
-                    source={
-                      item.profileImageUrl
-                        ? { uri: item.profileImageUrl }
-                        : require('@/assets/images/profile_pic.png')
-                    }
-                    style={styles.authorImage}
-                  />
-                  <View style={styles.postMetaContainer}>
-                    <Text style={styles.postMeta}>
-                      {item.author} • {postLikes[item.id] || item.likes} likes • {item.comments} comments
-                    </Text>
-                    <Text style={styles.timeStamp}>{formatRelativeTime(item.timestamp)}</Text>
-                  </View>
+          <View style={styles.postWrapper}>
+            <TouchableOpacity 
+              style={[
+                styles.postContainer,
+                isSecondPost && styles.partialPost
+              ]} 
+              onPress={() => router.push({
+                pathname: '../expanded-pages/discussionPage',
+                params: {
+                  id: item.id,
+                  title: item.title,
+                  author: item.author,
+                  views: item.views,
+                  likes: postLikes[item.id] || item.likes,
+                  comments: item.comments,
+                  content: item.content,
+                  tags: JSON.stringify(item.tags),
+                  profileImageUrl: item.profileImageUrl || null,
+                  timestamp: item.timestamp
+                }
+              })}
+              accessibilityLabel={`Post: ${item.title}`}
+              accessibilityHint="Double tap to view full post"
+            >
+              <View style={styles.postContainer}>
+                <Text style={styles.postTitle}>{item.title}</Text>
+                <Text style={styles.postPreview} numberOfLines={2}>
+                  {item.content}
+                </Text>
+                <View style={styles.tagsContainer}>
+                  {item.tags.map((tag, index) => (
+                    <View key={index} style={styles.tag}>
+                      <Text style={styles.tagText}>{tag}</Text>
+                    </View>
+                  ))}
                 </View>
-                {isCurrentUserPost ? (
-                  <View style={styles.postActions}>
-                    <TouchableOpacity
-                      onPress={() => {
-                        setEditingPost(item);
-                        setEditTitle(item.title);
-                        setEditContent(item.content);
-                      }}
-                      style={styles.actionButton}
-                    >
-                      <MaterialIcons name="edit" size={20} color="#005CEE" />
-                    </TouchableOpacity>
-                    <TouchableOpacity
-                      onPress={() => handleDeletePost(item.id)}
-                      style={styles.actionButton}
-                    >
-                      <MaterialIcons name="delete" size={20} color="#FF4444" />
-                    </TouchableOpacity>
+                <View style={styles.postFooter}>
+                  <View style={styles.authorInfo}>
+                    <Image
+                      source={
+                        item.profileImageUrl
+                          ? { uri: item.profileImageUrl }
+                          : require('@/assets/images/profile_pic.png')
+                      }
+                      style={styles.authorImage}
+                    />
+                    <View style={styles.postMetaContainer}>
+                      <Text style={styles.postMeta}>
+                        {item.author} • {postLikes[item.id] || item.likes} likes • {item.comments} comments
+                      </Text>
+                      <Text style={styles.timeStamp}>{formatRelativeTime(item.timestamp)}</Text>
+                    </View>
                   </View>
-                ) : (
-                  <View style={styles.postActions}>
-                    <TouchableOpacity
-                      onPress={(e) => {
-                        e.stopPropagation();
-                        handleLike(item.id, item.likes);
-                      }}
-                      style={styles.actionButton}
-                    >
-                      <FontAwesome name="thumbs-o-up" size={20} color="#005CEE" />
-                    </TouchableOpacity>
-                    <TouchableOpacity
-                      onPress={(e) => {
-                        e.stopPropagation();
-                        handleDislike(item.id, item.likes);
-                      }}
-                      style={styles.actionButton}
-                    >
-                      <FontAwesome name="thumbs-o-down" size={20} color="#666" />
-                    </TouchableOpacity>
-                    <TouchableOpacity
-                      onPress={(e) => {
-                        e.stopPropagation();
-                        handleShare(item.title);
-                      }}
-                      style={styles.actionButton}
-                    >
-                      <MaterialIcons name="share" size={20} color="#666" />
-                    </TouchableOpacity>
-                  </View>
-                )}
+                  {isCurrentUserPost ? (
+                    <View style={styles.postActions}>
+                      <TouchableOpacity
+                        onPress={() => {
+                          setEditingPost(item);
+                          setEditTitle(item.title);
+                          setEditContent(item.content);
+                        }}
+                        style={styles.actionButton}
+                      >
+                        <MaterialIcons name="edit" size={20} color="#005CEE" />
+                      </TouchableOpacity>
+                      <TouchableOpacity
+                        onPress={() => handleDeletePost(item.id)}
+                        style={styles.actionButton}
+                      >
+                        <MaterialIcons name="delete" size={20} color="#FF4444" />
+                      </TouchableOpacity>
+                    </View>
+                  ) : (
+                    <View style={styles.postActions}>
+                      <TouchableOpacity
+                        onPress={(e) => {
+                          e.stopPropagation();
+                          handleLike(item.id, item.likes);
+                        }}
+                        style={styles.actionButton}
+                      >
+                        <FontAwesome name="thumbs-o-up" size={20} color="#005CEE" />
+                      </TouchableOpacity>
+                      <TouchableOpacity
+                        onPress={(e) => {
+                          e.stopPropagation();
+                          handleDislike(item.id, item.likes);
+                        }}
+                        style={styles.actionButton}
+                      >
+                        <FontAwesome name="thumbs-o-down" size={20} color="#666" />
+                      </TouchableOpacity>
+                      <TouchableOpacity
+                        onPress={(e) => {
+                          e.stopPropagation();
+                          handleShare(item.title);
+                        }}
+                        style={styles.actionButton}
+                      >
+                        <MaterialIcons name="share" size={20} color="#666" />
+                      </TouchableOpacity>
+                    </View>
+                  )}
+                </View>
               </View>
-            </View>
-          </TouchableOpacity>
+            </TouchableOpacity>
+            {isSecondPost && showMoreButton}
+          </View>
         );
       case 'header':
         return <Text style={styles.meetupsHeader}>Meetups →</Text>;
@@ -468,19 +488,6 @@ const Forum: React.FC = () => {
                 <Text style={styles.meetupFormat}>{item.format}</Text>
               </View>
             </View>
-          </TouchableOpacity>
-        );
-      case 'showMore':
-        return (
-          <TouchableOpacity 
-            style={styles.showMoreButton}
-            onPress={() => setShowAllPosts(true)}
-            accessibilityLabel="Show more posts"
-            accessibilityHint="Double tap to show all forum posts"
-          >
-            <Text style={styles.showMoreText}>
-              Show More Posts ({filteredPosts.length - INITIAL_POSTS_TO_SHOW} more)...
-            </Text>
           </TouchableOpacity>
         );
       default:
@@ -884,16 +891,19 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   showMoreButton: {
+    position: 'absolute',
+    bottom: 60,
+    left: 16,
+    right: 16,
     backgroundColor: '#fff',
     padding: 16,
     borderRadius: 8,
-    marginBottom: 12,
-    marginHorizontal: 16,
     alignItems: 'center',
     shadowColor: '#000',
     shadowOpacity: 0.1,
     shadowRadius: 5,
     elevation: 2,
+    zIndex: 1,
   },
   showMoreText: {
     color: '#005CEE',
@@ -1020,6 +1030,14 @@ const styles = StyleSheet.create({
   removeTagButton: {
     marginLeft: 6,
     padding: 2,
+  },
+  postWrapper: {
+    position: 'relative',
+  },
+  partialPost: {
+    opacity: 0.5,
+    maxHeight: 200,
+    overflow: 'hidden',
   },
 });
 

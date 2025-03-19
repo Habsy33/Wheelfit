@@ -25,22 +25,42 @@ const eventsData = [
   {
     title: 'EXERCISE CLASS WITH ELLA',
     description: "Ella's friendly, engaging and knowledgeable style has made her a firm favourite with the disabled community throughout the UK. No gym required!",
-    image: require('@/assets/images/exercise_class_ella.jpg'),
+    image: require('@/assets/images/ella.png'),
+    contact: {
+      phone: '+44 141 123 4567',
+      email: 'ella@wheelfit.com',
+      address: '35 Scotland Street, G1 1PK, Glasgow'
+    }
   },
   {
     title: 'DISCOVER TAI CHI',
     description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
     image: require('@/assets/images/tai_chi.jpg'),
+    contact: {
+      phone: '+44 141 987 6543',
+      email: 'taichi@wheelfit.com',
+      address: 'Online Event'
+    }
   },
   {
     title: 'DISCOVER MORE TAI CHI',
     description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
-    image: require('@/assets/images/tai_chi.jpg'),
+    image: require('@/assets/images/tyshi.png'),
+    contact: {
+      phone: '+44 141 555 1234',
+      email: 'taichi.advanced@wheelfit.com',
+      address: '123 Queen Street, G1 3EX, Glasgow'
+    }
   },
   {
     title: 'EXTENDED EXERCISE CLASS WITH ELLA',
     description: "Ella's friendly, engaging and knowledgeable style has made her a firm favourite with the disabled community throughout the UK. No gym required!",
     image: require('@/assets/images/exercise_class_ella.jpg'),
+    contact: {
+      phone: '+44 141 123 4567',
+      email: 'ella@wheelfit.com',
+      address: '35 Scotland Street, G1 1PK, Glasgow'
+    }
   },
 ];
 
@@ -125,6 +145,9 @@ export default function NearYou() {
             description: event.description,
             date: "20/02/25",
             image: event.image,
+            phone: event.contact.phone,
+            email: event.contact.email,
+            address: event.contact.address
           } 
         })}
       >
@@ -141,13 +164,26 @@ export default function NearYou() {
   };
 
   const renderFitnessCenterCard = (center: any) => (
-    <View style={styles.fitnessCenterCard} key={center.name}>
+    <TouchableOpacity 
+      style={styles.fitnessCenterCard} 
+      key={center.name}
+      onPress={() => router.push({
+        pathname: "../expanded-pages/fitnessCentre",
+        params: {
+          name: center.name,
+          details: center.details,
+          distance: center.distance,
+          image: center.image,
+          category: center.category,
+        }
+      })}
+    >
       <Image source={center.image} style={styles.fitnessCenterImage} />
       <View style={styles.fitnessCenterDetails}>
         <Text style={styles.fitnessCenterName}>{center.name}</Text>
         <Text style={styles.fitnessCenterInfo}>{center.details} ( {center.distance} km )</Text>
       </View>
-    </View>
+    </TouchableOpacity>
   );
 
   const [selectedFilter, setSelectedFilter] = useState<string | null>(null);
@@ -226,15 +262,7 @@ export default function NearYou() {
             ))}
           </View>
           <View style={styles.fitnessCentersContainer}>
-            {getFilteredFitnessCenters().map(center => (
-              <View style={styles.fitnessCenterCard} key={center.name}>
-                <Image source={center.image} style={styles.fitnessCenterImage} />
-                <View style={styles.fitnessCenterDetails}>
-                  <Text style={styles.fitnessCenterName}>{center.name}</Text>
-                  <Text style={styles.fitnessCenterInfo}>{center.details} ( {center.distance} km )</Text>
-                </View>
-              </View>
-            ))}
+            {getFilteredFitnessCenters().map(center => renderFitnessCenterCard(center))}
           </View>
           <ScrollView style={styles.eventsList}>
             {events.map((event) => (

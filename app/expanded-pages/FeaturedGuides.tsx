@@ -173,6 +173,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     marginTop: 16,
     alignItems: 'center',
+    marginBottom: 50,
   },
   startButton: {
     backgroundColor: '#4299e1',

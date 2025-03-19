@@ -6,6 +6,8 @@ import { fetchExerciseTracking, deleteExerciseTracking, ExerciseTrackingData } f
 import { fetchEventsTracking, deleteEventTracking, EventTrackingData } from '@/utils/eventsTracking';
 import { auth } from '@/firebaseConfig';
 import { getStreakData, updateStreak } from '@/utils/streakFunctions';
+import { getUserMeetupsWithDetails, confirmMeetupAttendance, cancelMeetupAttendance } from '@/utils/meetupFunctions';
+import { router } from 'expo-router';
 
 const EventItem = ({ event, onDelete }: { event: EventTrackingData; onDelete: (eventId: string) => void }) => {
   const handleDelete = () => {
@@ -101,6 +103,179 @@ const ExerciseItem = ({ exercise, onDelete }: { exercise: ExerciseTrackingData; 
   );
 };
 
+const MeetupItem = ({ meetup, onCancel }: { meetup: any; onCancel: (meetupId: string) => void }) => {
+  const handleCancel = () => {
+    Alert.alert(
+      "Cancel Meetup",
+      "Are you sure you want to cancel your attendance for this meetup?",
+      [
+        {
+          text: "No, Keep It",
+          style: "cancel"
+        },
+        {
+          text: "Yes, Cancel",
+          style: "destructive",
+          onPress: () => onCancel(meetup.id)
+        }
+      ]
+    );
+  };
+
+  return (
+    <View style={styles.meetupItem}>
+      <MaterialCommunityIcons
+        name="account-group"
+        size={24}
+        color="#005CEE"
+        style={styles.meetupIcon}
+      />
+      <View style={styles.meetupDetails}>
+        <View style={styles.meetupHeader}>
+          <Text style={styles.meetupText}>
+            {meetup.title} - {meetup.date}
+          </Text>
+          <TouchableOpacity 
+            onPress={handleCancel}
+            style={styles.deleteButton}
+          >
+            <Ionicons name="trash-outline" size={20} color="#ff4444" />
+          </TouchableOpacity>
+        </View>
+        <Text style={styles.meetupDescription}>
+          {meetup.details}
+        </Text>
+        <Text style={styles.meetupLocation}>
+          {meetup.location} • {meetup.format}
+        </Text>
+      </View>
+    </View>
+  );
+};
+
+const ExerciseInsights = ({ exerciseCount }: { exerciseCount: number }) => {
+  const getInsightMessage = () => {
+    if (exerciseCount === 0) {
+      return {
+        message: "Start your fitness journey today! Every small step counts towards your goals.",
+        icon: "rocket",
+        color: "#FF6B6B"
+      };
+    } else if (exerciseCount <= 2) {
+      return {
+        message: "Great start! Keep building momentum - consistency is key to success.",
+        icon: "seedling",
+        color: "#4CAF50"
+      };
+    } else if (exerciseCount <= 5) {
+      return {
+        message: "You're on fire! Your dedication is showing great results.",
+        icon: "fire",
+        color: "#FF4500"
+      };
+    } else {
+      return {
+        message: "Incredible commitment! You're setting an amazing example for others.",
+        icon: "trophy",
+        color: "#FFD700"
+      };
+    }
+  };
+
+  const insight = getInsightMessage();
+
+  return (
+    <View style={styles.insightContainer}>
+      <View style={[styles.insightIconContainer, { backgroundColor: `${insight.color}20` }]}>
+        <FontAwesome5 name={insight.icon} size={20} color={insight.color} />
+      </View>
+      <Text style={styles.insightText}>{insight.message}</Text>
+    </View>
+  );
+};
+
+const EventInsights = ({ eventCount }: { eventCount: number }) => {
+  const getInsightMessage = () => {
+    if (eventCount === 0) {
+      return {
+        message: "Discover exciting events in your community! Join others and make new connections.",
+        icon: "compass",
+        color: "#FF6B6B"
+      };
+    } else if (eventCount <= 2) {
+      return {
+        message: "Great start! Keep exploring events to expand your fitness community.",
+        icon: "users",
+        color: "#4CAF50"
+      };
+    } else if (eventCount <= 5) {
+      return {
+        message: "You're actively engaged! Your participation inspires others in the community.",
+        icon: "star",
+        color: "#FF4500"
+      };
+    } else {
+      return {
+        message: "You're a community champion! Your dedication to events is truly inspiring.",
+        icon: "crown",
+        color: "#FFD700"
+      };
+    }
+  };
+
+  const insight = getInsightMessage();
+
+  return (
+    <View style={styles.insightContainer}>
+      <View style={[styles.insightIconContainer, { backgroundColor: `${insight.color}20` }]}>
+        <FontAwesome5 name={insight.icon} size={20} color={insight.color} />
+      </View>
+      <Text style={styles.insightText}>{insight.message}</Text>
+    </View>
+  );
+};
+
+const MeetupInsights = ({ meetupCount }: { meetupCount: number }) => {
+  const getInsightMessage = () => {
+    if (meetupCount === 0) {
+      return {
+        message: "Connect with others! Join meetups to share experiences and learn together.",
+        icon: "handshake",
+        color: "#FF6B6B"
+      };
+    } else if (meetupCount <= 2) {
+      return {
+        message: "Building connections! Keep joining meetups to grow your support network.",
+        icon: "heart",
+        color: "#4CAF50"
+      };
+    } else if (meetupCount <= 5) {
+      return {
+        message: "You're making great connections! Your active participation is valuable.",
+        icon: "smile",
+        color: "#FF4500"
+      };
+    } else {
+      return {
+        message: "You're a social butterfly! Your commitment to meetups is amazing.",
+        icon: "sun",
+        color: "#FFD700"
+      };
+    }
+  };
+
+  const insight = getInsightMessage();
+
+  return (
+    <View style={styles.insightContainer}>
+      <View style={[styles.insightIconContainer, { backgroundColor: `${insight.color}20` }]}>
+        <FontAwesome5 name={insight.icon} size={20} color={insight.color} />
+      </View>
+      <Text style={styles.insightText}>{insight.message}</Text>
+    </View>
+  );
+};
+
 const Explore = () => {
   const [exerciseTrackingData, setExerciseTrackingData] = useState<ExerciseTrackingData[]>([]);
   const [eventsTrackingData, setEventsTrackingData] = useState<EventTrackingData[]>([]);
@@ -109,6 +284,8 @@ const Explore = () => {
   const [currentQuoteIndex, setCurrentQuoteIndex] = useState(0);
   const [streakData, setStreakData] = useState<any>(null);
   const fadeAnim = useRef(new Animated.Value(1)).current;
+  const [userMeetups, setUserMeetups] = useState<any[]>([]);
+  const [showAllMeetups, setShowAllMeetups] = useState(false);
 
   const motivationalQuotes = [
     "“Don't limit your challenges, challenge your limits.”",
@@ -178,6 +355,23 @@ const Explore = () => {
     updateUserStreak();
   }, []);
 
+  // Add useEffect for fetching user meetups
+  useEffect(() => {
+    const fetchUserMeetups = async () => {
+      const user = auth.currentUser;
+      if (!user) return;
+
+      try {
+        const meetups = await getUserMeetupsWithDetails(user.uid);
+        setUserMeetups(meetups);
+      } catch (error) {
+        console.error("Error fetching user meetups:", error);
+      }
+    };
+
+    fetchUserMeetups();
+  }, []);
+
   const handleDeleteEvent = async (eventId: string) => {
     try {
       await deleteEventTracking(eventId);
@@ -204,6 +398,36 @@ const Explore = () => {
     }
   };
 
+  const handleNavigateToNearYou = () => {
+    router.push('/near-you');
+  };
+
+  const handleNavigateToExercises = () => {
+    router.push('/(tabs)');
+  };
+
+  const handleNavigateToMeetups = () => {
+    router.push('/expanded-pages/MeetupsPage');
+  };
+
+  const handleCancelMeetup = async (meetupId: string) => {
+    try {
+      await cancelMeetupAttendance(meetupId);
+      // Refresh the meetups list
+      const user = auth.currentUser;
+      if (user) {
+        const meetups = await getUserMeetupsWithDetails(user.uid);
+        setUserMeetups(meetups);
+      }
+    } catch (error) {
+      console.error("Error cancelling meetup:", error);
+      Alert.alert(
+        "Error",
+        "Failed to cancel meetup attendance. Please try again."
+      );
+    }
+  };
+
   return (
     <View style={styles.wrapper}>
       {/* Header Component */}
@@ -222,62 +446,6 @@ const Explore = () => {
             </Animated.Text>
             <FontAwesome5 name="quote-right" size={20} color="#fff" style={styles.quoteIcon} />
           </View>
-        </View>
-
-        {/* Exercise Tracking Card */}
-        <View style={styles.card}>
-          <Text style={styles.cardTitle}>Your Recent Exercises</Text>
-          {exerciseTrackingData.length > 0 ? (
-            <>
-              {(showAllExercises ? exerciseTrackingData : exerciseTrackingData.slice(0, 2)).map((exercise) => (
-                <ExerciseItem 
-                  key={exercise.exerciseId} 
-                  exercise={exercise} 
-                  onDelete={handleDeleteExercise}
-                />
-              ))}
-              {exerciseTrackingData.length > 2 && (
-                <TouchableOpacity 
-                  onPress={() => setShowAllExercises(!showAllExercises)}
-                  style={styles.showMoreButton}
-                >
-                  <Text style={styles.showMoreText}>
-                    {showAllExercises ? 'Show Less' : `Show More (${exerciseTrackingData.length - 2} more)`}
-                  </Text>
-                </TouchableOpacity>
-              )}
-            </>
-          ) : (
-            <Text style={styles.noExercisesText}>No exercises tracked yet. Keep going!</Text>
-          )}
-        </View>
-
-        {/* Events Tracking Card */}
-        <View style={styles.card}>
-          <Text style={styles.cardTitle}>Your Signed-Up Events</Text>
-          {eventsTrackingData.length > 0 ? (
-            <>
-              {(showAllEvents ? eventsTrackingData : eventsTrackingData.slice(0, 2)).map((event) => (
-                <EventItem 
-                  key={event.eventId} 
-                  event={event} 
-                  onDelete={handleDeleteEvent}
-                />
-              ))}
-              {eventsTrackingData.length > 2 && (
-                <TouchableOpacity 
-                  onPress={() => setShowAllEvents(!showAllEvents)}
-                  style={styles.showMoreButton}
-                >
-                  <Text style={styles.showMoreText}>
-                    {showAllEvents ? 'Show Less' : `Show More (${eventsTrackingData.length - 2} more)`}
-                  </Text>
-                </TouchableOpacity>
-              )}
-            </>
-          ) : (
-            <Text style={styles.noEventsText}>No events signed up yet. Explore events near you!</Text>
-          )}
         </View>
 
         {/* Daily Streak Card */}
@@ -318,6 +486,112 @@ const Explore = () => {
             </View>
           </View>
         </View>
+        {/* Exercise Tracking Card */}
+        <View style={styles.card}>
+          <Text style={styles.cardTitle}>Your Recent Exercises</Text>
+          {exerciseTrackingData.length > 0 ? (
+            <>
+              {(showAllExercises ? exerciseTrackingData : exerciseTrackingData.slice(0, 1)).map((exercise) => (
+                <ExerciseItem 
+                  key={exercise.exerciseId} 
+                  exercise={exercise} 
+                  onDelete={handleDeleteExercise}
+                />
+              ))}
+              {exerciseTrackingData.length > 1 && (
+                <TouchableOpacity 
+                  onPress={() => setShowAllExercises(!showAllExercises)}
+                  style={styles.showMoreButton}
+                >
+                  <Text style={styles.showMoreText}>
+                    {showAllExercises ? 'Show Less' : `Show More (${exerciseTrackingData.length - 1} more)`}
+                  </Text>
+                </TouchableOpacity>
+              )}
+              <ExerciseInsights exerciseCount={exerciseTrackingData.length} />
+            </>
+          ) : (
+            <View style={styles.emptyStateContainer}>
+              <Text style={styles.emptyStateText}>No exercises tracked yet. </Text>
+              <TouchableOpacity onPress={handleNavigateToExercises}>
+                <Text style={styles.emptyStateLink}>Try some exercises!</Text>
+              </TouchableOpacity>
+              <ExerciseInsights exerciseCount={0} />
+            </View>
+          )}
+        </View>
+
+        {/* Events Tracking Card */}
+        <View style={styles.card}>
+          <Text style={styles.cardTitle}>Your Signed-Up Events</Text>
+          {eventsTrackingData.length > 0 ? (
+            <>
+              {(showAllEvents ? eventsTrackingData : eventsTrackingData.slice(0, 1)).map((event) => (
+                <EventItem 
+                  key={event.eventId} 
+                  event={event} 
+                  onDelete={handleDeleteEvent}
+                />
+              ))}
+              {eventsTrackingData.length > 1 && (
+                <TouchableOpacity 
+                  onPress={() => setShowAllEvents(!showAllEvents)}
+                  style={styles.showMoreButton}
+                >
+                  <Text style={styles.showMoreText}>
+                    {showAllEvents ? 'Show Less' : `Show More (${eventsTrackingData.length - 1} more)`}
+                  </Text>
+                </TouchableOpacity>
+              )}
+              <EventInsights eventCount={eventsTrackingData.length} />
+            </>
+          ) : (
+            <View style={styles.emptyStateContainer}>
+              <Text style={styles.emptyStateText}>No events signed up yet. </Text>
+              <TouchableOpacity onPress={handleNavigateToNearYou}>
+                <Text style={styles.emptyStateLink}>Explore events near you!</Text>
+              </TouchableOpacity>
+              <EventInsights eventCount={0} />
+            </View>
+          )}
+        </View>
+
+        {/* User Meetups Card */}
+        <View style={styles.card}>
+          <Text style={styles.cardTitle}>Your Confirmed Meetups</Text>
+          {userMeetups.length > 0 ? (
+            <>
+              {(showAllMeetups ? userMeetups : userMeetups.slice(0, 1)).map((meetup) => (
+                <MeetupItem 
+                  key={meetup.id} 
+                  meetup={meetup}
+                  onCancel={handleCancelMeetup}
+                />
+              ))}
+              {userMeetups.length > 1 && (
+                <TouchableOpacity 
+                  onPress={() => setShowAllMeetups(!showAllMeetups)}
+                  style={styles.showMoreButton}
+                >
+                  <Text style={styles.showMoreText}>
+                    {showAllMeetups ? 'Show Less' : `Show More (${userMeetups.length - 1} more)`}
+                  </Text>
+                </TouchableOpacity>
+              )}
+              <MeetupInsights meetupCount={userMeetups.length} />
+            </>
+          ) : (
+            <View style={styles.emptyStateContainer}>
+              <Text style={styles.emptyStateText}>No meetups confirmed yet. </Text>
+              <TouchableOpacity onPress={handleNavigateToMeetups}>
+                <Text style={styles.emptyStateLink}>Browse available meetups!</Text>
+              </TouchableOpacity>
+              <MeetupInsights meetupCount={0} />
+            </View>
+          )}
+        </View>
+
+        
       </ScrollView>
     </View>
   );
@@ -334,12 +608,13 @@ const styles = StyleSheet.create({
     backgroundColor: '#f9f9f9',
     paddingHorizontal: 16,
     paddingTop: 20,
+    marginBottom: 100,
   },
   card: {
     backgroundColor: '#fff',
     borderRadius: 12,
     padding: 16,
-    marginBottom: 20,
+    marginBottom: 15,
     shadowColor: '#000',
     shadowOpacity: 0.1,
     shadowRadius: 6,
@@ -505,6 +780,83 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'flex-start',
     marginBottom: 4,
+  },
+  emptyStateContainer: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 10,
+  },
+  emptyStateText: {
+    fontSize: 16,
+    color: '#666',
+    textAlign: 'center',
+  },
+  emptyStateLink: {
+    fontSize: 16,
+    color: '#005CEE',
+    textAlign: 'center',
+    textDecorationLine: 'underline',
+    marginLeft: 4,
+  },
+  meetupItem: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    marginBottom: 10,
+    padding: 10,
+    backgroundColor: '#f5f5f5',
+    borderRadius: 8,
+  },
+  meetupIcon: {
+    marginRight: 10,
+    marginTop: 2,
+  },
+  meetupDetails: {
+    flex: 1,
+  },
+  meetupHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'flex-start',
+    marginBottom: 4,
+  },
+  meetupText: {
+    fontSize: 16,
+    color: '#333',
+    flexWrap: 'wrap',
+  },
+  meetupDescription: {
+    fontSize: 14,
+    color: '#666',
+    marginTop: 4,
+  },
+  meetupLocation: {
+    fontSize: 14,
+    color: '#666',
+    marginTop: 4,
+  },
+  insightContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#F8F9FA',
+    borderRadius: 8,
+    padding: 12,
+    marginTop: 12,
+  },
+  insightIconContainer: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 12,
+  },
+  insightText: {
+    flex: 1,
+    fontSize: 14,
+    color: '#333',
+    lineHeight: 20,
   },
 });
 

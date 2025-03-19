@@ -7,8 +7,11 @@ import {
   ScrollView,
 } from 'react-native';
 import { Header } from '@/components/Header'; // Importing the Header component
+import { useRouter } from 'expo-router';
+import { MaterialIcons } from '@expo/vector-icons';
 
 const Settings: React.FC = () => {
+  const router = useRouter();
 
   return (
     <View style={styles.wrapper}>
@@ -17,6 +20,15 @@ const Settings: React.FC = () => {
         title="WheelFit" 
         subtitle="Adaptive Home Workouts" 
       />
+
+      {/* Back Button */}
+      <TouchableOpacity 
+        style={styles.backButton} 
+        onPress={() => router.back()}
+      >
+        <MaterialIcons name="arrow-back" size={24} color="#007BFF" />
+        <Text style={styles.backButtonText}>Back</Text>
+      </TouchableOpacity>
 
       <ScrollView style={styles.container}>
         {/* Workout Settings Section */}
@@ -71,6 +83,17 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#F1F0F0', // Match the app background
     marginTop: -60, // Adjust based on your header height
+  },
+  backButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 16,
+    marginBottom: -20,
+  },
+  backButtonText: {
+    fontSize: 16,
+    color: '#007BFF',
+    marginLeft: 8,
   },
   container: {
     flex: 1,
