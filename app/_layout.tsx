@@ -8,6 +8,7 @@ import 'react-native-reanimated';
 
 import { useColorScheme } from '@/hooks/useColorScheme';
 
+// Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
 
 export default function RootLayout() {
@@ -28,9 +29,14 @@ export default function RootLayout() {
 
   return (
     <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-      <Stack>
-        {/* Ensure "(tabs)" defaults to "workouts" */}
-        <Stack.Screen name="(tabs)" options={{ headerShown: false }} initialParams={{ screen: 'workouts' }} />
+      <Stack screenOptions={{ headerShown: false }}>
+        {/* Auth stack (SignIn, SignUp) */}
+        <Stack.Screen name="(auth)" />
+
+        {/* Main App (Tabs) */}
+        <Stack.Screen name="(tabs)" />
+
+        {/* Handle 404s */}
         <Stack.Screen name="+not-found" />
       </Stack>
       <StatusBar style="auto" />
