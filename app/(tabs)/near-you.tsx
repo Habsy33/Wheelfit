@@ -508,5 +508,6 @@ const styles = StyleSheet.create({
   },
   eventsList: {
     marginTop: 16,
+    paddingHorizontal: 16,
   },
 });

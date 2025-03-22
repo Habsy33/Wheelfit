@@ -10,7 +10,7 @@ import { Ionicons, FontAwesome } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import { AuthNavigationProp } from './AppNavigation';
 import { signInWithEmailAndPassword } from "firebase/auth";
-import { auth } from "@/firebaseConfig";
+import { auth, db, ref, get, update } from "@/firebaseConfig";
 
 
 const SignIn: React.FC = () => {
@@ -31,11 +31,26 @@ const SignIn: React.FC = () => {
     try {
       const userCredential = await signInWithEmailAndPassword(auth, email, password);
       console.log("Signed in:", userCredential.user);
+
+      // Check if user has seen the tour
+      const userRef = ref(db, `users/${userCredential.user.uid}`);
+      const snapshot = await get(userRef);
+      
+      if (snapshot.exists()) {
+        const userData = snapshot.val();
+        // If hasSeenTour is not set, set it to true
+        if (!userData.hasSeenTour) {
+          await update(userRef, { hasSeenTour: true });
+        }
+      }
   
-      // Navigate to the main app
+      // Navigate to the main app with a parameter indicating sign in origin
       navigation.reset({
         index: 0,
-        routes: [{ name: "(tabs)" as never }],
+        routes: [{ 
+          name: "(tabs)" as never,
+          params: { fromSignIn: true }
+        }],
       });
   
     } catch (error: any) {
@@ -65,7 +80,7 @@ const SignIn: React.FC = () => {
       {/* Header */}
       <View style={styles.header}>
         <Text style={styles.title}>Sign In To WheelFit</Text>
-        <Text style={styles.subtitle}>Let’s personalize your fitness journey</Text>
+        <Text style={styles.subtitle}>Let's personalize your fitness journey</Text>
       </View>
 
 {/* Email Input */}
@@ -122,7 +137,7 @@ const SignIn: React.FC = () => {
        {/* Footer */}
        <View style={styles.footer}>
         <Text style={styles.footerText}>
-          Don’t have an account?{' '}
+          Don't have an account?{' '}
           <Text
             style={styles.link}
             onPress={() => navigation.navigate('SignUp')}

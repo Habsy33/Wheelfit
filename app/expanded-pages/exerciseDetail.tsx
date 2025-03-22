@@ -1,12 +1,14 @@
 import React, { useState, useEffect } from "react";
-import { View, Text, Image, StyleSheet, ScrollView, TouchableOpacity, Animated } from "react-native";
+import { View, Text, Image, StyleSheet, ScrollView, TouchableOpacity, Animated, Alert } from "react-native";
 import { useLocalSearchParams, useRouter } from "expo-router"; // Import useRouter for navigation
 import { Exercise } from "@/utils/exerciseDb";
 import { Header } from '@/components/Header'; // Import the Header component
 import { Ionicons } from "@expo/vector-icons"; // Import an icon library for the back button
-import { saveExerciseTracking } from "@/utils/fitnessTracker"; // Import the fitness tracking utility
+import { saveExerciseTracking } from "@/utils/fitnessTracker";
+import { updateWorkoutStreak } from "@/utils/streakFunctions";
 import { WebView } from 'react-native-webview';
 import Constants from 'expo-constants';
+import { auth } from "@/firebaseConfig";
 
 const ExerciseDetail: React.FC = () => {
   const { exercise } = useLocalSearchParams<{ exercise: string }>();
@@ -94,6 +96,9 @@ const ExerciseDetail: React.FC = () => {
 
 // Handle rating submission
 const handleRatingSubmit = async () => {
+    const user = auth.currentUser;
+    if (!user) return;
+
     // Prepare the exercise tracking data
     const exerciseTrackingData = {
       username: "", // Will be populated by saveExerciseTracking
@@ -108,11 +113,22 @@ const handleRatingSubmit = async () => {
       timestamp: Date.now(),
     };
   
-    // Save the exercise tracking data to Firebase
-    await saveExerciseTracking(exerciseTrackingData);
-  
-    // Redirect to /(tabs)
-    router.replace("/(tabs)");
+    try {
+      // Save the exercise tracking data to Firebase
+      await saveExerciseTracking(exerciseTrackingData);
+      
+      // Update the workout streak
+      await updateWorkoutStreak(user.uid);
+      
+      // Redirect to /(tabs)
+      router.replace("/(tabs)");
+    } catch (error) {
+      console.error("Error saving exercise data:", error);
+      Alert.alert(
+        "Error",
+        "Failed to save exercise data. Please try again."
+      );
+    }
   };
 
   // Custom Star Rating Component

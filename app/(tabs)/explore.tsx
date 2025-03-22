@@ -428,6 +428,10 @@ const Explore = () => {
     }
   };
 
+  const handleNavigateToAnalytics = () => {
+    router.push('/expanded-pages/analytics');
+  };
+
   return (
     <View style={styles.wrapper}>
       {/* Header Component */}
@@ -486,6 +490,26 @@ const Explore = () => {
             </View>
           </View>
         </View>
+
+        {/* Analytics Card */}
+        <TouchableOpacity style={styles.card} onPress={handleNavigateToAnalytics}>
+          <Text style={styles.cardTitle}>Activity Analytics</Text>
+          <View style={styles.analyticsContainer}>
+            <View style={styles.analyticsIconContainer}>
+              <FontAwesome5 name="chart-bar" size={32} color="#005CEE" />
+            </View>
+            <View style={styles.analyticsTextContainer}>
+              <Text style={styles.analyticsText}>
+                View your activity insights and progress
+              </Text>
+              <Text style={styles.analyticsSubtext}>
+                {exerciseTrackingData.length} exercises • {eventsTrackingData.length} events • {userMeetups.length} meetups
+              </Text>
+            </View>
+            <FontAwesome5 name="chevron-right" size={20} color="#666" />
+          </View>
+        </TouchableOpacity>
+
         {/* Exercise Tracking Card */}
         <View style={styles.card}>
           <Text style={styles.cardTitle}>Your Recent Exercises</Text>
@@ -590,8 +614,6 @@ const Explore = () => {
             </View>
           )}
         </View>
-
-        
       </ScrollView>
     </View>
   );
@@ -857,6 +879,32 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: '#333',
     lineHeight: 20,
+  },
+  analyticsContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#F8F9FA',
+    borderRadius: 12,
+    padding: 16,
+  },
+  analyticsIconContainer: {
+    backgroundColor: '#FFF',
+    borderRadius: 50,
+    padding: 12,
+    marginRight: 16,
+  },
+  analyticsTextContainer: {
+    flex: 1,
+  },
+  analyticsText: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#333',
+    marginBottom: 4,
+  },
+  analyticsSubtext: {
+    fontSize: 14,
+    color: '#666',
   },
 });
 

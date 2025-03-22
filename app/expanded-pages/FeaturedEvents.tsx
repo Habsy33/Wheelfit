@@ -135,8 +135,8 @@ const FeaturedEvents = () => {
         <Text style={styles.sectionTitle}>Who's Going</Text>
         <View style={styles.participantsList}>
           {participants.length > 0 ? (
-            participants.map((participant) => (
-              <View key={participant.userId} style={styles.participantItem}>
+            participants.map((participant, index) => (
+              <View key={`${participant.userId}-${index}`} style={styles.participantItem}>
                 <Image
                   source={participant.profilePicture ? { uri: participant.profilePicture } : require('@/assets/images/profile_pic.png')}
                   style={styles.participantAvatar}

@@ -42,7 +42,7 @@ export const createPost = async (title: string, content: string, tags: string[])
   const newPost = {
     title,
     content,
-    tags,
+    tags: tags || [], // Ensure tags is always an array
     author: '@' + username, // Use the fetched username
     userId: user.uid,
     timestamp: Date.now(),

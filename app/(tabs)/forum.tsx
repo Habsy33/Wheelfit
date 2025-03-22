@@ -113,7 +113,7 @@ const Forum: React.FC = () => {
     .filter(post =>
       post.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
       post.content.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      post.tags.some(tag => tag.toLowerCase().includes(searchQuery.toLowerCase()))
+      (post.tags && post.tags.some(tag => tag.toLowerCase().includes(searchQuery.toLowerCase())))
     );
 
   // Get limited or full list of posts based on showAllPosts state
@@ -391,7 +391,7 @@ const Forum: React.FC = () => {
                   {item.content}
                 </Text>
                 <View style={styles.tagsContainer}>
-                  {item.tags.map((tag, index) => (
+                  {item.tags && item.tags.map((tag, index) => (
                     <View key={index} style={styles.tag}>
                       <Text style={styles.tagText}>{tag}</Text>
                     </View>

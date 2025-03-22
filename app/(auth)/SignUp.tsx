@@ -60,6 +60,7 @@ const SignUp: React.FC = () => {
         username,
         email,
         createdAt: new Date().toISOString(),
+        hasSeenTour: false,
       });
   
       // Store username to prevent duplicates
